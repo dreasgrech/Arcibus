@@ -1,0 +1,14 @@
+#logs {
+	width: 500px;
+	height: 250px;
+	color: white;
+	background-color:black;
+	font-family: ‘Lucida Console’, Monaco, monospace;
+	overflow:auto;
+}
+
+#mainCanvas {
+	width: 500px;
+	height: 250px;
+	border:1px solid black;
+}
