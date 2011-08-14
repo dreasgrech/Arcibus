@@ -96,6 +96,9 @@ class Connection
         return true;
     }
     
+    /*
+     * Should be called whenever data is recieved
+     */
     public function onData($data)
     {
         if ($this->handshaked) {
@@ -110,13 +113,34 @@ class Connection
         }
     }
     
+    public function send($data)
+    {
+        if (! @socket_write($this->socket, chr(0) . $data . chr(255), strlen($data) + 2)) {
+            @socket_close($this->socket);
+            $this->socket = false;
+        }
+    }
+    
+    public function onDisconnect()
+    {
+        $this->log('Disconnected', 'info');
+        
+        if ($this->application) {
+            $this->application->removeClient($this);
+        }
+        socket_close($this->socket);
+    }
+    
+    /*
+     * 
+     */
     private function handle($data)
     {
         $chunks = explode(chr(255), $data);
 
         for ($i = 0; $i < count($chunks) - 1; $i++) {
             $chunk = $chunks[$i];
-            if (substr($chunk, 0, 1) != chr(0)) {
+            if (substr($chunk, 0, 1) != chr(0)) { // if the first character of the chunk is not NULL (Ascii: 0)
                 $this->log('Data incorrectly framed. Dropping connection');
                 socket_close($this->socket);
                 return false;
@@ -135,24 +159,6 @@ class Connection
         $policy .= '<allow-access-from domain="*" to-ports="*"/>' . "\n";
         $policy .= '</cross-domain-policy>' . "\n";
         socket_write($this->socket, $policy, strlen($policy));
-        socket_close($this->socket);
-    }
-    
-    public function send($data)
-    {
-        if (! @socket_write($this->socket, chr(0) . $data . chr(255), strlen($data) + 2)) {
-            @socket_close($this->socket);
-            $this->socket = false;
-        }
-    }
-    
-    public function onDisconnect()
-    {
-        $this->log('Disconnected', 'info');
-        
-        if ($this->application) {
-            $this->application->removeClient($this);
-        }
         socket_close($this->socket);
     }
 

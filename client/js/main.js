@@ -1,14 +1,8 @@
 window.onload = function() {
 	var logs = logger(document.getElementById('logs')),
-	server = socketServer('ws://uploadz.myftp.org:8000');
-	var connectionSuccess = server.connect(function() {
-		logs.writeLine('Connection opened');
-	});
+	socketServ = socketServer('ws://uploadz.myftp.org:8000');
 
-	if (!connectionSuccess) {
-		logs.writeLine("Your browser doesn't support sockets, so use a different browser or go away.");
-	}
-
+	/*
 	server.onMessage(function(data) {
 		try {
 			var obj = JSON.parse(data);
@@ -17,9 +11,63 @@ window.onload = function() {
 
 		}
 	});
+	*/
 
-	server.onClose(function() {
-		logs.writeLine('Connection closed');
+	var server = function(socketServerObj, onOpen, onClose) {
+		var onMessageListeners = [];
+		informListeners = function(message) {
+			var i = 0,
+			j = onMessageListeners.length,
+			listener;
+			for (; i < j; ++i) {
+				listener = onMessageListeners[i];
+				listener[obj.action] && listener[obj.action](obj);
+			}
+
+		};
+
+		// Connect to the server
+		var connectionSuccess = socketServerObj.connect(function() {
+			onOpen();
+			//logs.writeLine('Connection opened');
+		});
+
+		if (!connectionSuccess) {
+			throw "Your browser doesn't support sockets, so use a different browser or go away."
+		}
+
+		socketServerObj.onClose(onClose);
+		socketServerObj.onMessage(function(data) {
+			try {
+				var obj = JSON.parse(data);
+				informListeners(obj);
+			} catch(ex) {
+
+			}
+		});
+
+		return {
+			listen: function(callbacks) {
+				// callbacks: {<actionName>: <callback>, <actionName>: <callback>}
+				onMessageListeners.push(callbacks);
+			}
+		};
+	};
+
+	var mainServer;
+	//try {
+		mainServer = server(socketServ, function() {
+			logs.writeLine('Connection opened');
+		},
+		function() {
+			logs.writeLine('Connection closed');
+		});
+	//} catch(ex) { // couldn't connect to the server
+	//	logs.writeLine(ex);
+	//}
+
+	mainServer.listen({
+		"": function() {}
 	});
 
 	var sendButton = document.getElementById('send');
@@ -31,7 +79,7 @@ window.onload = function() {
 			return;
 		}
 
-		server.send(data);
+		socketServ.send(data);
 	};
 
 	var mainCanvas = document.getElementById('mainCanvas');
@@ -46,11 +94,13 @@ window.onload = function() {
 
 	var local;
 	var players = [];
+	var messages;
 
 	var serverActions = {
 		"welcome": function(obj) {
 			logs.writeLine("Welcome to the server");
-			local = localPlayer(g,obj.playerID, vector2(60, 10), "img/p1.png");
+			messages = messageHandler(server, obj.playerID);
+			local = localPlayer(g, messages, obj.playerID, vector2(60, 10), "img/p1.png");
 		},
 		"log": function(obj) {
 			logs.writeLine(obj.message);
@@ -63,79 +113,6 @@ window.onload = function() {
 			console.log(obj);
 		}
 	};
-
-	var player = function(game, id, initialPosition, imagePath) {
-		var position = initialPosition,
-		angle = 0,
-		speed = 2,
-		image = new Image();
-		image.onload = function() {
-			//obj.draw();
-		};
-		image.src = imagePath;
-
-		var draw = function() {
-			/*
-			         * http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
-			         */
-			var x = game.canvas.width / 2;
-			var y = game.canvas.height / 2;
-			game.context.translate(x, y);
-			game.context.rotate(angle);
-			game.context.drawImage(image, position.x, position.y);
-			game.context.rotate( - angle);
-			game.context.translate( - x, - y);
-		};
-
-		return {
-			draw: draw,
-			update: function() {},
-			speed:speed,
-			angle:angle,
-			position: position
-		};
-	};
-
-	var localPlayer = function(game, id, initialPosition, imagePath) {
-		var playerObj = player(game, id, initialPosition, imagePath);
-		var getVelocity = function() {
-			var scale_x = Math.cos(playerObj.angle),
-			scale_y = Math.sin(playerObj.angle);
-			return {
-				x: playerObj.speed * scale_x,
-				y: playerObj.speed * scale_y
-			};
-		};
-
-		playerObj.moveLeft = function() {
-				var velocity = getVelocity();
-				playerObj.position.x -= velocity.x;
-				//position.y -= velocity_y;
-		};
-
-		playerObj.moveRight = function() {
-				var velocity = getVelocity();
-				playerObj.position.x += velocity.x;
-				//position.y += velocity_y;
-		}
-
-		playerObj.update = function() {
-			if (keyHandler.isKeyPressed(KEYS.left)) {
-				playerObj.moveLeft();
-			}
-
-			if (keyHandler.isKeyPressed(KEYS.right)) {
-				playerObj.moveRight();
-			}
-		};
-
-		return playerObj;
-	};
-
-
-	/*var step = function() {
-		clearCanvas(context);
-	};*/
 
 };
 

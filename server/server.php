@@ -5,7 +5,7 @@ include 'message.php';
 
 class Server {
 
-	public $clients = array();
+	public $clients = array(); // a hash table to hold all the Connection instances
 	private $allSockets = array();
 	private $master;
 	private $application;
@@ -50,12 +50,11 @@ class Server {
 						$index = array_search($socket, $this->allSockets);
 						unset($this->allSockets[$index]);
 						unset($client);
-
 					} else {
 						$trimmed = substr($data, 1,-1); // for some reason, the data recieved contains single leading and trailing whitespace characters which trim() won't remove!
 						$dec = json_decode($trimmed);
 						print_r($dec);
-						$this->log("Recieved: " . $data);
+						//$this->log("Recieved: " . $data);
 						$client->onData($data);
 
 						//$playerMoveMessage = new PlayerMoveMessage(

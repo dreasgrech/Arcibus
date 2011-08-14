@@ -1,10 +1,12 @@
-var messageHandler = function(socketServer) {
+var messageHandler = function(socketServer, playerID) {
 	var registeredCallbacks = {},
-	messageActionNames: {
+	messageActionNames= {
 		welcome: "welcome",
 		log: "log",
 		playerMove: "playerMove",
 		playerlist: "playerlist"
+	}, initializeMessage = function () {
+		return {ID: playerID};
 	};
 
 	return {
@@ -18,7 +20,8 @@ var messageHandler = function(socketServer) {
 		},
 		outgoing: {
 			sendMovedMessage: function(position) {
-				var message = position;
+				var message = initializeMessage();
+				message.position = position;
 				message.action = messageActionNames.playerMove;
 				socketServer.send(JSON.stringify(message));
 			}
