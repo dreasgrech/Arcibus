@@ -9,9 +9,16 @@ class Server {
 	private $sockets = array();
 
 	private $onClientConnect, $onClientDisconnect;
-	private $hooks;
+	protected $hooks;
 
 	public function __construct($address = 'localhost', $port = 8080, $hooks) {
+		/*
+		 * Available hooks:
+		 * * onClientConnect($this, $socket) => when a new client connects
+		 * * onClientDisconnect($this, $socket) => when an existing client disconnects
+		 * * onMessage($this, $message, $socket) => when a message is recieved from a client
+		 */
+
 		$this->address = $address;
 		$this->port = $port;
 		$this->masterSocket = $this->createMasterSocket();
@@ -22,9 +29,19 @@ class Server {
 	}
 
 	public function getIPAddress($socket) {
-		$addr = NULL;
 		socket_getpeername($socket, $addr);
 		return $addr;
+	}
+
+	/*
+	 * Sends a message to all connected clients
+	 */
+	public function broadcast($message) {
+		// TODO: this method
+	}
+
+	public function sendMessage($socket, $message) {
+		socket_write($socket, $message, strlen($message));
 	}
 
 	private function getSpecifiedHook($name) {
@@ -92,12 +109,13 @@ class Server {
 					continue;
 				}
 
-				echo $data . PHP_EOL;
+				$this->invokeHook('onMessage', $data, $socket);
 			}
 		}
 	}
 }
 
+/*
 $address = '192.168.1.5';
 $port = 8000;
 
@@ -108,24 +126,10 @@ $hooks = array(
 	}, 'onClientDisconnect' => function ($s, $socket) {
 		$ip = $s->getIPAddress($socket);
 		echo "Client disconnected: " . $ip . PHP_EOL;
+	}, 'onMessage' => function ($s, $message, $socket) {
+		$ip = $s->getIPAddress($socket);
+		echo sprintf("[%s] %s", $ip, $message);
 	});
 
 $server = new Server($address, $port, $hooks);
-
-/*
-$sock = socket_create(AF_INET, SOCK_STREAM, 0);
-
-socket_bind($sock, $address, $port) or die("Couldn't bind to address");
-socket_listen($sock);
-
-$client = socket_accept($sock);
-$input = socket_read($client, 1024); // reads from the accepted socket, 1024 bytes at a time
-
-$output = "Thanks, " . $input . chr(0);
-echo $output;
-
-socket_write($client, $output);
-socket_close($client);
-socket_close($sock);
  */
-?>

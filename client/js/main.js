@@ -13,7 +13,7 @@ window.onload = function() {
 	});
 	*/
 
-	var server = function(socketServerObj, onOpen, onClose) {
+	var server = function(socketServerObj, onOpen, onClose) { //TODO: use the same hooks approach
 		var onMessageListeners = [];
 		informListeners = function(message) {
 			var i = 0,

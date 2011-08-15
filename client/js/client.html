@@ -1,0 +1,23 @@
+<input type="button" id="send" value="send" />
+
+<script src="server.js"></script>
+<script>
+	document.getElementById('send').onclick = function () {
+		client.send("asdasdasd");
+	};
+
+	var hooks = {
+		'onConnect': function() {
+			alert('Welcome to the server');
+		},
+		'onDisconnect': function() {
+			console.log('disconnected');
+		},
+		'onMessage': function(message) {
+			alert(message);
+		}
+	};
+
+	var client = webSocketClient("ws://uploadz.myftp.org:8000", hooks);
+	client.start();
+</script>
