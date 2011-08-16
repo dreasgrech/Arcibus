@@ -1,18 +1,4 @@
 <?php
-include 'socketserver.php';
-
-// TODO: put these classes in seperate files
-
-class WebSocketClient {
-	public $handshaked;
-	public $socket;
-
-	public function __construct($socket) {
-		$this->handshaked = false;
-		$this->socket = $socket;
-	}
-}
-
 class Handshake { 
 	private $data;
 
@@ -21,8 +7,9 @@ class Handshake {
 	}
 
 	public function getHandshake() {
-		$data = $this->data;
+		// Source: https://github.com/nicokaiser/php-websocket/blob/master/server/lib/WebSocket/Connection.php
 
+		$data = $this->data;
 		$lines = preg_split("/\r\n/", $data);
 
 		if (! preg_match('/\AGET (\S+) HTTP\/1.1\z/', $lines[0], $matches)) { //TODO: work on this one
@@ -97,61 +84,4 @@ class Handshake {
 			'';
 	}
 }
-
-class WebSocketServer extends Server {
-
-	private $webSocketClients = array();
-
-	public function __construct($address = 'localhost', $port = 8080, $hooks) {
-		$webSocketClients = $this->webSocketClients;
-
-		//TODO: Override the disconnect hook to remove the clients from the $webSocketClients array
-
-		$overriddenHooks = array(
-			'onClientConnect' => function ($parent, $socket) use (&$webSocketClients, $hooks) {
-				$webSocketClients[$socket] = new WebSocketClient($socket);
-				if ($hook = $hooks['onClientConnect']) {
-					$hook($parent, $socket);
-				}
-			},
-				'onMessage' => function ($parent, $message, $socket) use (&$webSocketClients, $hooks) {
-					if ($webSocketClients[$socket]->handshaked && ($hook = $hooks['onMessage'])) {
-						$hook($parent, $message, $socket);
-						return;
-					}
-
-					//Do the handshake
-					$handShakeObj = new Handshake($message);
-					socket_write($socket, $handShakeObj->getHandshake());
-					$webSocketClients[$socket]->handshaked = true;
-				}
-		);
-
-		parent::__construct($address, $port, $overriddenHooks);
-	}
-
-	public function sendMessage($socket, $message) {
-		$message = chr(0) . $message . chr(255);
-		parent::sendMessage($socket, $message);
-	}
-}
-
-$address = '192.168.1.5';
-$port = 8000;
-
-$hooks = array(
-	'onClientConnect' => function ($s, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo "New client connected: " . $ip . PHP_EOL;
-	}, 'onClientDisconnect' => function ($s, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo "Client disconnected: " . $ip . PHP_EOL;
-	}, 'onMessage' => function ($s, $message, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo sprintf("[%s] %s" . PHP_EOL, $ip, $message);
-		$s->sendMessage($socket, "Thanks for the message");
-	});
-
-$server = new WebSocketServer($address, $port, $hooks);
-
 ?>

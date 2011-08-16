@@ -1,8 +1,6 @@
 <?php
 
-error_reporting(E_ALL);
-
-class Server {
+class SocketServer {
 	private $address, $port;
 
 	private $masterSocket;
@@ -44,6 +42,10 @@ class Server {
 		socket_write($socket, $message, strlen($message));
 	}
 
+	public function numberOfClients() {
+		return count($this->sockets) - 1; // decrease by 1 because you don't want to include the master socket
+	}
+
 	private function getSpecifiedHook($name) {
 		if (isset($this->hooks[$name])) {
 			return $this->hooks[$name];
@@ -75,7 +77,11 @@ class Server {
 	}
 
 	private function startListening() {
-		// Start listening on the master socket
+		/*
+		 * Start listening on the master socket
+		 * Note, this function does not return.
+		 */
+
 		if (!($listenSuccess = socket_listen($this->masterSocket))) {
 			die(sprintf("Couldn't start listening on %s:%s => %s", $this->address, $this->port, socket_strerror($listenSuccess)));
 		}
@@ -87,24 +93,25 @@ class Server {
 			socket_select($changedSockets, $write = NULL, $except = NULL, NULL); 
 
 			foreach($changedSockets as $socket) {
-				if ($socket == $this->masterSocket) { // Current socket is the master socket, so 
+				if ($socket == $this->masterSocket) {
+					// Current socket is the master socket, so check for incoming connections
 					$newClient = socket_accept($this->masterSocket);
 					if ($newClient < 0) {
 						// Failed to accept the new connection
 						continue;
 					}
 
+					$this->sockets[] = $newClient; // TODO: use the sockets array as a hash instead.
 					$this->invokeHook('onClientConnect', $newClient);
 
-					$this->sockets[] = $newClient;
 					continue;
 				}
 
 				if (socket_recv($socket, $data, 2048, 0) == 0) {
 					// If the recieved data is 0, it means a disconnect message so remove the socket from the array
-					$this->invokeHook('onClientDisconnect', $socket);
 					$socketArrayIndex = array_search($socket, $this->sockets);
 					unset($this->sockets[$socketArrayIndex]);
+					$this->invokeHook('onClientDisconnect', $socket);
 					socket_close($socket);
 					continue;
 				}
@@ -114,22 +121,3 @@ class Server {
 		}
 	}
 }
-
-/*
-$address = '192.168.1.5';
-$port = 8000;
-
-$hooks = array(
-	'onClientConnect' => function ($s, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo "New client connected: " . $ip . PHP_EOL;
-	}, 'onClientDisconnect' => function ($s, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo "Client disconnected: " . $ip . PHP_EOL;
-	}, 'onMessage' => function ($s, $message, $socket) {
-		$ip = $s->getIPAddress($socket);
-		echo sprintf("[%s] %s", $ip, $message);
-	});
-
-$server = new Server($address, $port, $hooks);
- */
