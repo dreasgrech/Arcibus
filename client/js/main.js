@@ -9,19 +9,32 @@ window.onload = function() {
 		}
 	},
 	socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
-	messages = messageHandler(socketClient); 
-	messages.incoming.registerMessageAction("welcome", function (data) {
-			console.log(data);
-			});
-	//messagelistener = socketMessageListener(socketClient);
+	messages = messageHandler(socketClient),
+	mainCanvas = document.getElementById('mainCanvas'),
+	local_player;
+
+	messages.incoming.registerMessageAction("welcome", function(data) {
+		local_player = localPlayer(g, messages, data.playerID, vector2(60, 10), "img/p1.png");
+		g.addPlayer(local_player);
+
+		console.log(data);
+	});
+
+	frameTimer.tick();
+
+	var g = game(mainCanvas, function(gameObject) {
+		gameObject.clearCanvas();
+		//move the stuff and update
+		gameObject.forEachPlayer(function(player) {
+			player.update(frameTimer.getSeconds());
+			player.draw();
+			frameTimer.tick();
+		});
+	});
 
 	socketClient.start();
-
-	/*
-	messagelistener.listen(function (message) {
-			alert(message);
-			});
-			*/
+};
+/*
 
 	var sendButton = document.getElementById('send');
 	sendButton.onclick = function() {
@@ -35,15 +48,6 @@ window.onload = function() {
 		socketClient.send(data);
 	};
 
-	var mainCanvas = document.getElementById('mainCanvas');
-	var g = game(mainCanvas, function(gameObject) {
-		gameObject.clearCanvas();
-		//move the stuff and update
-		if (local) {
-			local.update();
-			local.draw();
-		}
-	});
 
 	var local;
 	var players = [];
@@ -68,4 +72,5 @@ window.onload = function() {
 	};
 
 };
+*/
 

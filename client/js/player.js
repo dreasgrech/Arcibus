@@ -1,7 +1,7 @@
 var player = function(game, id, initialPosition, imagePath) {
 	var position = initialPosition,
 	angle = 0,
-	speed = 2,
+	speed = 150,
 	image = new Image();
 	image.onload = function() {
 		//obj.draw();
@@ -9,9 +9,7 @@ var player = function(game, id, initialPosition, imagePath) {
 	image.src = imagePath;
 
 	var draw = function() {
-		/*
-			         * http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
-			         */
+		// http://stackoverflow.com/questions/3793397/html5-canvas-drawimage-with-at-an-angle
 		var x = game.canvas.width / 2;
 		var y = game.canvas.height / 2;
 		game.context.translate(x, y);

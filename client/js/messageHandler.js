@@ -10,7 +10,7 @@ var messageHandler = function(client) {
 		data = data || {};
 		data.ID = id;
 		data.action = action;
-		client.send(data);
+		client.send(JSON.stringify(data));
 	};
 
 	client.setHook(client.availableHooks.onMessage, function(data) {
@@ -40,7 +40,7 @@ var messageHandler = function(client) {
 		},
 		outgoing: {
 			sendMovedMessage: function(id, position) {
-				sendMessage(id, {
+				sendMessage(id, "moved", {
 					position: position
 				});
 			}

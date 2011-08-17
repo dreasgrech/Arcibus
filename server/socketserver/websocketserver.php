@@ -3,6 +3,10 @@ include 'socketserver.php';
 include 'websocketclient.php';
 include 'handshake.php';
 
+/*
+ * This class contains an extra hook 'onClientHandshaked' which fires upon
+ * a handshake is sucessfully sent to the client
+ */
 class WebSocketServer extends SocketServer {
 
 	private $webSocketClients = array(); // this holds a collection of WebSocketClient instances, and is needed to manage the handshake flag.

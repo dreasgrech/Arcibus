@@ -4,8 +4,19 @@ var game = function(canvasElement, step) {
 	}
 
 	var context = canvasElement.getContext('2d'),
-	stepInterval = 10,
+	stepInterval = 5,
 	obj = {
+		players: [],
+		addPlayer: function(player) {
+			obj.players.push(player);
+		},
+		forEachPlayer: function(callback) {
+			var i = 0,
+			j = obj.players.length;
+			for (; i < j; ++i) {
+				callback(obj.players[i]);
+			}
+		},
 		context: context,
 		canvas: canvasElement,
 		clearCanvas: function() {
@@ -21,3 +32,4 @@ var game = function(canvasElement, step) {
 
 	return obj;
 };
+

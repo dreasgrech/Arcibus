@@ -9,30 +9,30 @@ var localPlayer = function(game, messageHandler, id, initialPosition, imagePath)
 		};
 	},
 	sendMovedMessage = function() {
-		messageHandler.outgoing.sendMovedMessage(playerObj.position);
+		messageHandler.outgoing.sendMovedMessage(id, playerObj.position);
 	};
 
-	playerObj.moveLeft = function() {
+	playerObj.moveLeft = function(time) {
 		var velocity = getVelocity();
-		playerObj.position.x -= velocity.x;
+		playerObj.position.x -= velocity.x * time;
 		//position.y -= velocity_y;
-		sendMovedMessage();
+		//sendMovedMessage();
 	};
 
-	playerObj.moveRight = function() {
+	playerObj.moveRight = function(time) {
 		var velocity = getVelocity();
-		playerObj.position.x += velocity.x;
+		playerObj.position.x += velocity.x * time;
 		//position.y += velocity_y;
-		sendMovedMessage();
+		//sendMovedMessage();
 	}
 
-	playerObj.update = function() {
+	playerObj.update = function(time) {
 		if (keyHandler.isKeyPressed(KEYS.left)) {
-			playerObj.moveLeft();
+			playerObj.moveLeft(time);
 		}
 
 		if (keyHandler.isKeyPressed(KEYS.right)) {
-			playerObj.moveRight();
+			playerObj.moveRight(time);
 		}
 	};
 
