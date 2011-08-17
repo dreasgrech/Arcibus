@@ -1,74 +1,27 @@
 window.onload = function() {
 	var logs = logger(document.getElementById('logs')),
-	socketServ = socketServer('ws://uploadz.myftp.org:8000');
+	socketHooks = {
+		'onConnect': function() {
+			logs.writeLine("Connected to the server sucessfully");
+		},
+		'onDisconnect': function() {
+			logs.writeLine("Disconnected from the server");
+		}
+	},
+	socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
+	messages = messageHandler(socketClient); 
+	messages.incoming.registerMessageAction("welcome", function (data) {
+			console.log(data);
+			});
+	//messagelistener = socketMessageListener(socketClient);
+
+	socketClient.start();
 
 	/*
-	server.onMessage(function(data) {
-		try {
-			var obj = JSON.parse(data);
-			serverActions[obj.action](obj);
-		} catch(ex) {
-
-		}
-	});
-	*/
-
-	var server = function(socketServerObj, onOpen, onClose) { //TODO: use the same hooks approach
-		var onMessageListeners = [];
-		informListeners = function(message) {
-			var i = 0,
-			j = onMessageListeners.length,
-			listener;
-			for (; i < j; ++i) {
-				listener = onMessageListeners[i];
-				listener[obj.action] && listener[obj.action](obj);
-			}
-
-		};
-
-		// Connect to the server
-		var connectionSuccess = socketServerObj.connect(function() {
-			onOpen();
-			//logs.writeLine('Connection opened');
-		});
-
-		if (!connectionSuccess) {
-			throw "Your browser doesn't support sockets, so use a different browser or go away."
-		}
-
-		socketServerObj.onClose(onClose);
-		socketServerObj.onMessage(function(data) {
-			try {
-				var obj = JSON.parse(data);
-				informListeners(obj);
-			} catch(ex) {
-
-			}
-		});
-
-		return {
-			listen: function(callbacks) {
-				// callbacks: {<actionName>: <callback>, <actionName>: <callback>}
-				onMessageListeners.push(callbacks);
-			}
-		};
-	};
-
-	var mainServer;
-	//try {
-		mainServer = server(socketServ, function() {
-			logs.writeLine('Connection opened');
-		},
-		function() {
-			logs.writeLine('Connection closed');
-		});
-	//} catch(ex) { // couldn't connect to the server
-	//	logs.writeLine(ex);
-	//}
-
-	mainServer.listen({
-		"": function() {}
-	});
+	messagelistener.listen(function (message) {
+			alert(message);
+			});
+			*/
 
 	var sendButton = document.getElementById('send');
 	sendButton.onclick = function() {
@@ -79,7 +32,7 @@ window.onload = function() {
 			return;
 		}
 
-		socketServ.send(data);
+		socketClient.send(data);
 	};
 
 	var mainCanvas = document.getElementById('mainCanvas');

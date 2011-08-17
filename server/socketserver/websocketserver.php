@@ -12,20 +12,20 @@ class WebSocketServer extends SocketServer {
 
 		$that = $this; // Since $this can't be used as a lexical variable, you need to do this workaround (https://bugs.php.net/bug.php?id=49543)
 		$overriddenHooks = array(
-			'onClientConnect' => function ($parent, $socket) use (&$webSocketClients, $hooks) {
+			'onClientConnect' => function ($parent, $socket) use (&$webSocketClients, $hooks, &$that) {
 				$webSocketClients[$socket] = new WebSocketClient($socket);
 				if ($hook = $hooks['onClientConnect']) {
-					$hook($parent, $socket);
+					$hook($that, $socket);
 				}
 			},
-				'onMessage' => function ($parent, $message, $socket) use (&$webSocketClients, $hooks, $that) {
+				'onMessage' => function ($parent, $message, $socket) use (&$webSocketClients, $hooks, &$that) {
 					/*
 					 * The first time a client sends a message, we must do the handshake.
 					 */
 					if ($webSocketClients[$socket]->handshaked && ($hook = $hooks['onMessage'])) {
 						// Pass the message to the original onMessage callback that was passed in
 						$message = $that->unwrapIncomingMessage($message);
-						$hook($parent, $message, $socket);
+						$hook($that, $message, $socket);
 						return;
 					}
 
@@ -33,11 +33,14 @@ class WebSocketServer extends SocketServer {
 					$handShakeObj = new Handshake($message);
 					socket_write($socket, $handShakeObj->getHandshake()); 
 					$webSocketClients[$socket]->handshaked = true;
+					if ($hook = $hooks['onClientHandshaked']) {
+						$hook($that, $socket);
+					}
 				},
-					'onClientDisconnect' => function ($parent, $socket) use (&$webSocketClients, $hooks) {
+					'onClientDisconnect' => function ($parent, $socket) use (&$webSocketClients, $hooks, &$that) {
 						unset($webSocketClients[$socket]);
 						if ($hook = $hooks['onClientDisconnect']) {
-							$hook($parent, $socket);
+							$hook($that, $socket);
 						}
 					}
 		);

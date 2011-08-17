@@ -1,31 +1,51 @@
-var messageHandler = function(socketServer, playerID) {
+var messageHandler = function(client) {
 	var registeredCallbacks = {},
-	messageActionNames= {
+	messageActionNames = {
 		welcome: "welcome",
 		log: "log",
 		playerMove: "playerMove",
 		playerlist: "playerlist"
-	}, initializeMessage = function () {
-		return {ID: playerID};
+	},
+	sendMessage = function(id, action, data) {
+		data = data || {};
+		data.ID = id;
+		data.action = action;
+		client.send(data);
 	};
+
+	client.setHook(client.availableHooks.onMessage, function(data) {
+		var message, action;
+		try {
+			message = JSON.parse(data);
+		} catch (ex){
+		console.log("Error parsing message to JSON => " + data);
+			return;
+		}
+
+		action = registeredCallbacks[message.action];
+		if (action) {
+			action(message);
+		}
+	});
 
 	return {
 		incoming: {
 			registerMessageAction: function(actionName, callback) {
 				registeredCallbacks[actionName] = callback;
-			},
+			}
+			/*,
 			invokeCallback: function(actionName, messageObject) {
 				return registeredCallbacks[actionName](messageObject);
-			}
+			}*/
 		},
 		outgoing: {
-			sendMovedMessage: function(position) {
-				var message = initializeMessage();
-				message.position = position;
-				message.action = messageActionNames.playerMove;
-				socketServer.send(JSON.stringify(message));
+			sendMovedMessage: function(id, position) {
+				sendMessage(id, {
+					position: position
+				});
 			}
 		}
 	};
 
 };
+

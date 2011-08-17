@@ -4,7 +4,7 @@
 </head>
 <body>
 <script src="js/json2.js"></script>
-<script src="js/socketServer.js"></script>
+<script src="js/websocketclient.js"></script>
 <script src="js/logger.js"></script>
 <script src="js/messageHandler.js"></script>
 <script src="js/game.js"></script>

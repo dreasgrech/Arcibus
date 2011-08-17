@@ -40,6 +40,5 @@ class PlayerListMessage extends Message {
 		parent::__construct("playerlist");
 		$this->list = $list;
 	}
-
 }
 ?>
