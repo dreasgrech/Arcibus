@@ -4,12 +4,14 @@ class Player {
 	public $ID;
 	public $socket;
 
+	public $nick;
 	public $position;
 
-	public function __construct($server, $id, $socket) {
+	public function __construct($server, $socket, $id, $nick) {
 		$this->server = $server;
-		$this->ID = $id;
 		$this->socket = $socket;
+		$this->ID = $id;
+		$this->playerName = $nick;
 	}
 
 	public function sendMessage($message) {

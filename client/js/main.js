@@ -21,6 +21,10 @@ window.onload = function() {
 		main.addPlayer("guzi");
 	});
 
+	messages.incoming.registerMessageAction("playerlist", function(data) {
+			console.log(data);
+	});
+
 	frameTimer.tick();
 
 	var g = game(mainCanvas, function(gameObject, time) {

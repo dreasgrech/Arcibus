@@ -1,13 +1,21 @@
 <?php
+error_reporting(E_ALL);
+
+/*function __autoload($className){
+	echo $className;
+	require_once $className.'.php';
+}*/
+
 include 'socketserver/websocketserver.php';
 include 'logger.php';
 include 'player.php';
-include 'message.php';
+include 'outgoingmessages/OutgoingMessage.php';
+include 'outgoingmessages/WelcomePlayerMessage.php';
+include 'outgoingmessages/PlayerListMessage.php';
 include 'vector2.php';
-include 'messagehandler.php';
+include 'incomingmessages/incomingmessagemanager.php';
 include 'game.php';
 
-error_reporting(E_ALL);
 
 $address = '192.168.1.5';
 $port = 8000;
@@ -23,8 +31,8 @@ $hooks = array(
 		$logger->logServerAction("New client connected: " . $ip);
 	}, 
 		'onClientHandshaked' => function ($s, $socket) use (&$game, $logger) {
-			$newPlayer = new Player($s, Player::generatePlayerID(), $socket);
-			$game->addPlayer($newPlayer);
+			$ip = $s->getIPAddress($socket);
+			$logger->logServerAction("Successfully handshaked with " . $ip);
 		},
 			'onClientDisconnect' => function ($s, $socket) use ($logger, &$game) {
 				$ip = $s->getIPAddress($socket);

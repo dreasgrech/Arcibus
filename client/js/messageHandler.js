@@ -46,8 +46,8 @@ var messageHandler = function(client) {
 					position: position
 				});
 			},
-			sendIntroduction: function(name) {
-						  sendMessage(false, "introduction", {name:name});
+			sendIntroduction: function(nick) {
+						  sendMessage(false, "introduction", {nick:nick});
 			}
 		}
 	};
