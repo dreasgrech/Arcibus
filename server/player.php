@@ -4,6 +4,8 @@ class Player {
 	public $ID;
 	public $socket;
 
+	public $position;
+
 	public function __construct($server, $id, $socket) {
 		$this->server = $server;
 		$this->ID = $id;
@@ -11,7 +13,7 @@ class Player {
 	}
 
 	public function sendMessage($message) {
-		$this->server->sendMessage($this->socket, $message->serialize());
+		$this->socket->send($message->serialize());
 	}
 
 	public static function generatePlayerID() {

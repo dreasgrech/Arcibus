@@ -3,8 +3,11 @@ var game = function(canvasElement, step) {
 		throw "Your browser doesn't support the Canvas, so use a different browser or go away.";
 	}
 
+	canvasElement.width = 800;
+	canvasElement.height = 600;
+
 	var context = canvasElement.getContext('2d'),
-	stepInterval = 5,
+	stepInterval = 1,
 	obj = {
 		players: [],
 		addPlayer: function(player) {
@@ -25,8 +28,10 @@ var game = function(canvasElement, step) {
 		stepInterval: stepInterval
 	};
 
+	frameTimer.tick();
 	setInterval(function() {
-		step.call(obj, obj);
+		step.call(obj, obj, frameTimer.getSeconds());
+		frameTimer.tick();
 	},
 	stepInterval);
 

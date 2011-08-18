@@ -8,7 +8,9 @@ var messageHandler = function(client) {
 	},
 	sendMessage = function(id, action, data) {
 		data = data || {};
+		if (id) {
 		data.ID = id;
+		}
 		data.action = action;
 		client.send(JSON.stringify(data));
 	};
@@ -17,8 +19,8 @@ var messageHandler = function(client) {
 		var message, action;
 		try {
 			message = JSON.parse(data);
-		} catch (ex){
-		console.log("Error parsing message to JSON => " + data);
+		} catch(ex) {
+			console.log("Error parsing message to JSON => " + data);
 			return;
 		}
 
@@ -43,6 +45,9 @@ var messageHandler = function(client) {
 				sendMessage(id, "moved", {
 					position: position
 				});
+			},
+			sendIntroduction: function(name) {
+						  sendMessage(false, "introduction", {name:name});
 			}
 		}
 	};

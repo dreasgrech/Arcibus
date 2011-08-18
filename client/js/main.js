@@ -14,23 +14,31 @@ window.onload = function() {
 	local_player;
 
 	messages.incoming.registerMessageAction("welcome", function(data) {
-		local_player = localPlayer(g, messages, data.playerID, vector2(60, 10), "img/p1.png");
+		local_player = localPlayer(g, messages, data.playerID, vector2(300, 10), "img/p1.png");
 		g.addPlayer(local_player);
 
 		console.log(data);
+		main.addPlayer("guzi");
 	});
 
 	frameTimer.tick();
 
-	var g = game(mainCanvas, function(gameObject) {
+	var g = game(mainCanvas, function(gameObject, time) {
 		gameObject.clearCanvas();
 		//move the stuff and update
 		gameObject.forEachPlayer(function(player) {
-			player.update(frameTimer.getSeconds());
+			player.update(time);
 			player.draw();
-			frameTimer.tick();
 		});
 	});
+
+	var connectButton = document.getElementById('connectButton');
+	connectButton.onclick = function () {
+		var playerName = document.getElementById('playerNameInput').value;
+		messages.outgoing.sendIntroduction(playerName);
+	};
+
+	var main = mainScreen();
 
 	socketClient.start();
 };

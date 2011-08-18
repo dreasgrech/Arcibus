@@ -1,3 +1,7 @@
+var lerp = function (x1, x2, w) {
+	return x1 + (x2 - x1) * w;
+};
+
 var localPlayer = function(game, messageHandler, id, initialPosition, imagePath) {
 	var playerObj = player(game, id, initialPosition, imagePath),
 	getVelocity = function() {
@@ -16,6 +20,7 @@ var localPlayer = function(game, messageHandler, id, initialPosition, imagePath)
 		var velocity = getVelocity();
 		playerObj.position.x -= velocity.x * time;
 		//position.y -= velocity_y;
+		
 		//sendMovedMessage();
 	};
 
@@ -34,6 +39,8 @@ var localPlayer = function(game, messageHandler, id, initialPosition, imagePath)
 		if (keyHandler.isKeyPressed(KEYS.right)) {
 			playerObj.moveRight(time);
 		}
+
+		//playerObj.position.x = lerp(playerObj.position.x, movingTo, 0.1);
 	};
 
 	return playerObj;

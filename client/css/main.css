@@ -5,10 +5,34 @@
 	background-color:black;
 	font-family: ‘Lucida Console’, Monaco, monospace;
 	overflow:auto;
+	display:none;
+}
+
+#main {
+	width:800px;
+	height:600px;
+	margin: 0px auto;
+}
+
+.screen {
+	width:800px;
+	height:600px;
+	margin: 0px auto;
+}
+
+#main-screen {
+	background-image:url('../img/main.png');
+}
+
+#current-players {
+	background-color:yellow;
+	width:200px;
+	height:200px;
+	position:relative;
+	top:30px;
+	left:60px;
 }
 
 #mainCanvas {
-	width: 500px;
-	height: 250px;
 	border:1px solid black;
 }

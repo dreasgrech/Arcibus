@@ -17,9 +17,9 @@ class WebSocketServer extends SocketServer {
 		$that = $this; // Since $this can't be used as a lexical variable, you need to do this workaround (https://bugs.php.net/bug.php?id=49543)
 		$overriddenHooks = array(
 			'onClientConnect' => function ($parent, $socket) use (&$webSocketClients, $hooks, &$that) {
-				$webSocketClients[$socket] = new WebSocketClient($socket);
+				$webSocketClients[$socket] = new WebSocketClient($that, $socket);
 				if ($hook = $hooks['onClientConnect']) {
-					$hook($that, $socket);
+					$hook($that, $webSocketClients[$socket]);
 				}
 			},
 				'onMessage' => function ($parent, $message, $socket) use (&$webSocketClients, $hooks, &$that) {
@@ -29,7 +29,7 @@ class WebSocketServer extends SocketServer {
 					if ($webSocketClients[$socket]->handshaked && ($hook = $hooks['onMessage'])) {
 						// Pass the message to the original onMessage callback that was passed in
 						$message = $that->unwrapIncomingMessage($message);
-						$hook($that, $message, $socket);
+						$hook($that, $message, $webSocketClients[$socket]);
 						return;
 					}
 
@@ -38,13 +38,14 @@ class WebSocketServer extends SocketServer {
 					socket_write($socket, $handShakeObj->getHandshake()); 
 					$webSocketClients[$socket]->handshaked = true;
 					if ($hook = $hooks['onClientHandshaked']) {
-						$hook($that, $socket);
+						$hook($that, $webSocketClients[$socket]);
 					}
 				},
 					'onClientDisconnect' => function ($parent, $socket) use (&$webSocketClients, $hooks, &$that) {
+						$webSocket = $webSocketClients[$socket];
 						unset($webSocketClients[$socket]);
 						if ($hook = $hooks['onClientDisconnect']) {
-							$hook($that, $socket);
+							$hook($that, $webSocket);
 						}
 					}
 		);
@@ -58,6 +59,10 @@ class WebSocketServer extends SocketServer {
 		 * ASCII characters 0 (NULL) and 255 before transmitting it
 		 */
 		parent::sendMessage($socket, $this->wrapOutgoingMessage($message));
+	}
+
+	public function getIPAddress($socket) {
+		return parent::getIPAddress($socket->socket);
 	}
 
 	private function wrapOutgoingMessage($message) {
