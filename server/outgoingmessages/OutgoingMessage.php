@@ -11,20 +11,53 @@ class OutgoingMessage {
 	}
 
 	protected function manuallyConstructMessage($data) {
-		$jsonMessage = array();
-		$jsonMessage[] = "{";
-		$jsonMessage[] = $this->serializeKeyValue("action", $this->action) . ",";
-
-		foreach($data as $key => $value) {
-			$jsonMessage[] = $this->serializeKeyValue($key, $value) . ",";
-		}
-
-		$message = $this->removeLastCharacter(implode("", $jsonMessage)) . "}";
-		return $message;
+		$data["action"] = $this->action;
+		return $this->constructJSONObject($data);
 	}
 
-	private function serializeKeyValue($key, $value) {
-		return '"' . $key . '" : "' . $value . '"';
+	/*
+	 * Had to change this method's access modifier from protected to public because so that this 
+	 * method is able to be called from within a closure, because PHP won't allow me to call 
+	 * non-public methods from within an object passed into the closure via use().
+	 *
+	 * The support for closures without lexical scoping in PHP is really starting to annoy me.
+	 */
+	public function constructJSONObject ($data) {
+		return $this->construct($data, function ($key, $value) {
+			return '"' . $key . '" : "' . $value . '"';
+		}, "{", "}");
+	}
+
+	protected function constructJSONArray($elements, $callback) {
+		$that = $this;
+		return $this->construct($elements, function ($key, $value) use ($that, $callback) {
+			return $callback($that, $key, $value);
+		}, "[", "]");
+	}
+
+	private function construct($elements, $enumerationCallback, $openingBrace, $closingBrace) {
+		$serialized = array();
+		$serialized[] = $openingBrace;
+
+		foreach($elements as $key => $value) {
+			$serialized[] = $enumerationCallback($key, $value) . ",";
+		}
+
+		/* 
+		 * Since a foreach loop in PHP keeps reference to the last enumerated object, in this case
+		 * a key and value pair, we need to unset them manually.  What's up with that?
+		 */
+		unset($key);
+		unset($value);
+
+		$string = implode("", $serialized);
+		if (count($elements) > 0) {
+			$string = $this->removeLastCharacter($string); // the last character in this case is the trailing comma
+		}
+
+		$string .= $closingBrace;
+
+		return $string;
 	}
 
 	private function removeLastCharacter ($str) { // This function shouldn't be in this class, but anyways...

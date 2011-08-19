@@ -4,11 +4,17 @@ class PlayerListMessage extends OutgoingMessage {
 
 	public function __construct($list) {
 		parent::__construct("playerlist");
-		$this->playerlist = $list;
+		$this->playerList = $list;
 	}
 
 	public function serialize() { 
-		return $this->manuallyConstructMessage(array("list"=>count($this->playerlist)));
+		$that = $this;
+		$players = $this->constructJSONArray($this->playerList,  function ($key, $value) use ($that) {
+			$player = $key;
+			return $that->constructJSONObject(array("nick"=>$player->nick));
+		});
+		echo $players;
+		return $this->manuallyConstructMessage(array("playerList"=>$players));
 	}
 }
 ?>

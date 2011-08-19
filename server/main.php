@@ -33,12 +33,15 @@ $hooks = array(
 		'onClientHandshaked' => function ($s, $socket) use (&$game, $logger) {
 			$ip = $s->getIPAddress($socket);
 			$logger->logServerAction("Successfully handshaked with " . $ip);
+
+			$playerListMessage = new PlayerListMessage($game->players);
+			$socket->send($playerListMessage->serialize());
 		},
 			'onClientDisconnect' => function ($s, $socket) use ($logger, &$game) {
-				$ip = $s->getIPAddress($socket);
-				$logger->logServerAction("Client disconnected: " . $ip);
-				$player = $game->getPlayerFromSocket($socket);
-				$game->removePlayer($player);
+				//$ip = $s->getIPAddress($socket);
+				//$logger->logServerAction("Client disconnected: " . $ip);
+				//$player = $game->getPlayerFromSocket($socket);
+				//$game->removePlayer($player);
 			}, 'onMessage' => function ($s, $message, $socket) use (&$game, &$messageHandler) {
 				$data = json_decode($message);
 				$ip = $s->getIPAddress($socket);
@@ -46,6 +49,6 @@ $hooks = array(
 				$messageHandler->handleMessage($socket, $data);
 			});
 $server = NULL;
-$messageHandler = new IncomingMessageManager(&$server, $game);
+$messageHandler = new IncomingMessageManager(&$server, &$game);
 $server = new WebSocketServer($address, $port, $hooks); //This needs to be the last because of the blocking loop
 ?>
