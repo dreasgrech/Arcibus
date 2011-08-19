@@ -19,6 +19,10 @@ class Game {
 	}
 	 */
 
+	public function isPlayer($socket) {
+		return isset($this->players[$socket->socket]);
+	}
+
 	public function getPlayerFromSocket($socket) {
 		echo "Players: ".count($this->players).PHP_EOL;
 		return $this->players[$socket->socket];

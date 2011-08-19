@@ -24,14 +24,18 @@ class OutgoingMessage {
 	 */
 	public function constructJSONObject ($data) {
 		return $this->construct($data, function ($key, $value) {
-			return '"' . $key . '" : "' . $value . '"';
+			$json = '"' . $key . '" : ';
+			if (!(strcmp($value[0],"[") && strcmp($value[strlen($value) - 1],"]"))) { // check to see if the current $value is not a JSON array, because if it is, we don't want to surround it with "
+				return $json .= $value;
+			}
+
+			return $json .= '"' . $value . '"';
 		}, "{", "}");
 	}
 
 	protected function constructJSONArray($elements, $callback) {
-		$that = $this;
-		return $this->construct($elements, function ($key, $value) use ($that, $callback) {
-			return $callback($that, $key, $value);
+		return $this->construct($elements, function ($key, $value) use ($callback) {
+			return $callback($key, $value);
 		}, "[", "]");
 	}
 

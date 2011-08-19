@@ -11,7 +11,7 @@ class Player {
 		$this->server = $server;
 		$this->socket = $socket;
 		$this->ID = $id;
-		$this->playerName = $nick;
+		$this->nick = $nick;
 	}
 
 	public function sendMessage($message) {

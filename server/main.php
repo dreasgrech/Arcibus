@@ -40,8 +40,10 @@ $hooks = array(
 			'onClientDisconnect' => function ($s, $socket) use ($logger, &$game) {
 				//$ip = $s->getIPAddress($socket);
 				//$logger->logServerAction("Client disconnected: " . $ip);
-				//$player = $game->getPlayerFromSocket($socket);
-				//$game->removePlayer($player);
+				if ($game->isPlayer($socket)) {
+					$player = $game->getPlayerFromSocket($socket);
+					$game->removePlayer($player);
+				}
 			}, 'onMessage' => function ($s, $message, $socket) use (&$game, &$messageHandler) {
 				$data = json_decode($message);
 				$ip = $s->getIPAddress($socket);

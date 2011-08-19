@@ -10,10 +10,8 @@ class PlayerListMessage extends OutgoingMessage {
 	public function serialize() { 
 		$that = $this;
 		$players = $this->constructJSONArray($this->playerList,  function ($key, $value) use ($that) {
-			$player = $key;
-			return $that->constructJSONObject(array("nick"=>$player->nick));
+			return $that->constructJSONObject(array("nick"=>$value->nick));
 		});
-		echo $players;
 		return $this->manuallyConstructMessage(array("playerList"=>$players));
 	}
 }

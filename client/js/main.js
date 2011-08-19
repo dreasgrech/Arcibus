@@ -13,15 +13,29 @@ window.onload = function() {
 	mainCanvas = document.getElementById('mainCanvas'),
 	local_player;
 
+	var listPlaceholder = document.getElementById('availablePlayers');
+	var addToPlayerList = function (nick) {
+		var playerRow = document.createElement('div');
+		playerRow.innerHTML = nick;
+		listPlaceholder.appendChild(playerRow);
+	};
+
 	messages.incoming.registerMessageAction("welcome", function(data) {
 		local_player = localPlayer(g, messages, data.playerID, vector2(300, 10), "img/p1.png");
 		g.addPlayer(local_player);
 
+		addToPlayerList(data.nick);
+
 		console.log(data);
-		main.addPlayer("guzi");
+		//main.addPlayer("guzi");
 	});
 
 	messages.incoming.registerMessageAction("playerlist", function(data) {
+			var i = 0, j = data.playerList.length, player;
+			for (; i < j; ++i) {
+			addToPlayerList(data.playerList[i].nick);
+			}
+
 			console.log(data);
 	});
 
@@ -37,7 +51,7 @@ window.onload = function() {
 	});
 
 	var connectButton = document.getElementById('connectButton');
-	connectButton.onclick = function () {
+	connectButton.onclick = function () { // Connect to the server
 		var playerName = document.getElementById('playerNameInput').value;
 		messages.outgoing.sendIntroduction(playerName);
 	};

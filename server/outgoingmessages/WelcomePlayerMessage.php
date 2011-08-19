@@ -1,16 +1,16 @@
 <?php
 class WelcomePlayerMessage extends OutgoingMessage {
 	public $game;
-	public $playerID;
+	public $player;
 
-	public function __construct($game, $playerID) {
+	public function __construct($game, $player) {
 		parent::__construct("welcome");
 		$this->game = $game;
-		$this->playerID = $playerID;
+		$this->player = $player;
 	}
 
 	public function serialize() {
-		return $this->manuallyConstructMessage(array("ID"=>$this->playerID));
+		return $this->manuallyConstructMessage(array("ID"=>$this->player->ID, "nick"=>$this->player->nick));
 	}
 }
 ?>
