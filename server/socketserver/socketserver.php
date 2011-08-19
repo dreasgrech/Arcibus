@@ -22,10 +22,11 @@ class SocketServer {
 		$this->masterSocket = $this->createMasterSocket();
 		$this->sockets[] = $this->masterSocket;
 		$this->hooks = $hooks;
-
-		$this->startListening(); // needs to be the last line because this method contains the infinite loop
 	}
 
+	/*
+	 * Returns the IP address of the given socket
+	 */
 	public function getIPAddress($socket) {
 		socket_getpeername($socket, $addr);
 		return $addr;
@@ -35,9 +36,14 @@ class SocketServer {
 	 * Sends a message to all connected clients
 	 */
 	public function broadcast($message) {
-		// TODO: this method
+		foreach ($this->socket as $socket) {
+			$this->sendMessage($socket, $message);
+		}
 	}
 
+	/*
+	 * Sends a message to the socket
+	 */
 	public function sendMessage($socket, $message) {
 		socket_write($socket, $message, strlen($message));
 	}
@@ -76,7 +82,7 @@ class SocketServer {
 		return $master;
 	}
 
-	private function startListening() {
+	public function startListening() {
 		/*
 		 * Start listening on the master socket
 		 * Note, this function does not return.

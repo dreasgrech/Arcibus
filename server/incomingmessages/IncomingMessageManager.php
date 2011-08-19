@@ -8,10 +8,15 @@ class IncomingMessageManager {
 
 	private $handlers = array();
 	private $server;
+	private $game;
 
-	public function __construct($server, $game) {
+	public function __construct($game) {
+		$this->game = $game;
+	}
+
+	public function start($server) {
 		$this->server = $server;
-		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $game);
+		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $this->game);
 	}
 
 	public function handleMessage($socket, $message) {

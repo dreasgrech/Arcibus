@@ -9,7 +9,7 @@ class WelcomePlayerMessage extends OutgoingMessage {
 		$this->player = $player;
 	}
 
-	public function serialize() {
+	public function __toString() {
 		return $this->manuallyConstructMessage(array("ID"=>$this->player->ID, "nick"=>$this->player->nick));
 	}
 }

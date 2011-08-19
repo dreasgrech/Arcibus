@@ -11,7 +11,7 @@ class WebSocketClient {
 	}
 
 	public function send($message) {
-		return $this->server->sendMessage($this->socket, $message);
+		return $this->server->sendMessage($this, $message);
 	}
 }
 ?>

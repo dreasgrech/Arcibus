@@ -20,10 +20,11 @@ class IntrodutionMessageHandler extends IncomingMessageHandler implements iIncom
 		$this->game->addPlayer($newPlayer);
 
 		$welcomeMessage = new WelcomePlayerMessage($this->game, $newPlayer);
-		$socket->send($welcomeMessage->serialize());
+		$socket->send($welcomeMessage);
 
-		//$pl = new PlayerListMessage($this->game->players);
-		//$socket->send($pl->serialize());
+		$playerListMessage = new PlayerListMessage($this->game->players);
+		$this->server->broadcast($playerListMessage);
+
 	}
 }
 ?>

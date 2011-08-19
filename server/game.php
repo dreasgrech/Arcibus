@@ -14,11 +14,6 @@ class Game {
 		unset($this->players[$player->socket->socket]);
 	}
 
-	/*
-	public function handleMessage($message) {
-	}
-	 */
-
 	public function isPlayer($socket) {
 		return isset($this->players[$socket->socket]);
 	}
@@ -26,6 +21,25 @@ class Game {
 	public function getPlayerFromSocket($socket) {
 		echo "Players: ".count($this->players).PHP_EOL;
 		return $this->players[$socket->socket];
+	}
+
+	// Sends a message to every player
+	public function broadcast($message) {
+		foreach($this->players as $player) {
+			$player->sendMessage($message);
+		}
+		unset($player);
+	}
+
+	public function broadcastExcept($message, $exceptPlayer) {
+		foreach($this->players as $player) {
+			if ($player == $exceptPlayer) {
+				continue;
+			}
+
+			$player->sendMessage($message);
+		}
+		unset($player);
 	}
 }
 ?>

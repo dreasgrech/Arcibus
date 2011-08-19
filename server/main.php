@@ -7,6 +7,8 @@ error_reporting(E_ALL);
 }*/
 
 include 'socketserver/websocketserver.php';
+include 'JSONConstruction.php';
+include 'StringUtils.php';
 include 'logger.php';
 include 'player.php';
 include 'outgoingmessages/OutgoingMessage.php';
@@ -23,19 +25,19 @@ $port = 8000;
 $logger = new Logger();
 $game = new Game();
 
-$messageHandler = NULL;
+$messageHandler = new IncomingMessageManager(&$game);
 
 $hooks = array(
 	'onClientConnect' => function ($s, $socket) use ($logger) {
 		$ip = $s->getIPAddress($socket);
 		$logger->logServerAction("New client connected: " . $ip);
 	}, 
-		'onClientHandshaked' => function ($s, $socket) use (&$game, $logger) {
+		'onClientHandshaked' => function ($s, $socket) use (&$game, $logger) { // At this point, the client is not a player yet
 			$ip = $s->getIPAddress($socket);
 			$logger->logServerAction("Successfully handshaked with " . $ip);
 
 			$playerListMessage = new PlayerListMessage($game->players);
-			$socket->send($playerListMessage->serialize());
+			$socket->send($playerListMessage);
 		},
 			'onClientDisconnect' => function ($s, $socket) use ($logger, &$game) {
 				//$ip = $s->getIPAddress($socket);
@@ -43,6 +45,9 @@ $hooks = array(
 				if ($game->isPlayer($socket)) {
 					$player = $game->getPlayerFromSocket($socket);
 					$game->removePlayer($player);
+
+					$playerListMessage = new PlayerListMessage($game->players);
+					$s->broadcast($playerListMessage);
 				}
 			}, 'onMessage' => function ($s, $message, $socket) use (&$game, &$messageHandler) {
 				$data = json_decode($message);
@@ -50,7 +55,9 @@ $hooks = array(
 				echo sprintf("[%s] %s" . PHP_EOL, $ip, $message);
 				$messageHandler->handleMessage($socket, $data);
 			});
-$server = NULL;
-$messageHandler = new IncomingMessageManager(&$server, &$game);
-$server = new WebSocketServer($address, $port, $hooks); //This needs to be the last because of the blocking loop
+$server = new WebSocketServer($address, $port, $hooks); 
+$messageHandler->start(&$server);
+
+$server->startListening(); //This needs to be the last because of the blocking loop
 ?>
+

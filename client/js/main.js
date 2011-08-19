@@ -32,6 +32,7 @@ window.onload = function() {
 
 	messages.incoming.registerMessageAction("playerlist", function(data) {
 			var i = 0, j = data.playerList.length, player;
+			listPlaceholder.innerHTML = "";
 			for (; i < j; ++i) {
 			addToPlayerList(data.playerList[i].nick);
 			}

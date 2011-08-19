@@ -12,7 +12,7 @@ class WebSocketServer extends SocketServer {
 	private $webSocketClients = array(); // this holds a collection of WebSocketClient instances, and is needed to manage the handshake flag.
 
 	public function __construct($address = 'localhost', $port = 8080, $hooks) {
-		$webSocketClients = $this->webSocketClients;
+		$webSocketClients = &$this->webSocketClients;
 
 		$that = $this; // Since $this can't be used as a lexical variable, you need to do this workaround (https://bugs.php.net/bug.php?id=49543)
 		$overriddenHooks = array(
@@ -58,9 +58,18 @@ class WebSocketServer extends SocketServer {
 		 * This method is overridden because we need to wrap the message with 
 		 * ASCII characters 0 (NULL) and 255 before transmitting it
 		 */
-		parent::sendMessage($socket, $this->wrapOutgoingMessage($message));
+		parent::sendMessage($socket->socket, $this->wrapOutgoingMessage($message));
 	}
 
+	public function broadcast($message) {
+		foreach($this->webSocketClients as $webSocketClient) {
+			$this->sendMessage($webSocketClient, $message);
+		}
+	}
+
+	/*
+	 * Overriden to pass in the socket resource to the server
+	 */
 	public function getIPAddress($socket) {
 		return parent::getIPAddress($socket->socket);
 	}

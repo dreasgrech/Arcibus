@@ -15,7 +15,7 @@ class Player {
 	}
 
 	public function sendMessage($message) {
-		$this->socket->send($message->serialize());
+		$this->socket->send($message);
 	}
 
 	public static function generatePlayerID() {
