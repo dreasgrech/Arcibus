@@ -13,9 +13,10 @@ include 'logger.php';
 include 'player.php';
 include 'outgoingmessages/OutgoingMessage.php';
 include 'outgoingmessages/WelcomePlayerMessage.php';
+include 'outgoingmessages/ChatMessage.php';
 include 'outgoingmessages/PlayerListMessage.php';
-include 'vector2.php';
 include 'incomingmessages/incomingmessagemanager.php';
+include 'vector2.php';
 include 'game.php';
 
 
@@ -54,7 +55,10 @@ $hooks = array(
 				$ip = $s->getIPAddress($socket);
 				echo sprintf("[%s] %s" . PHP_EOL, $ip, $message);
 				$messageHandler->handleMessage($socket, $data);
-			});
+			},
+				'onIteration' => function () {
+					echo "o";
+				});
 $server = new WebSocketServer($address, $port, $hooks); 
 $messageHandler->start(&$server);
 

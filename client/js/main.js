@@ -1,103 +1,85 @@
-window.onload = function() {
-	var logs = logger(document.getElementById('logs')),
-	socketHooks = {
-		'onConnect': function() {
-			logs.writeLine("Connected to the server sucessfully");
+(function($) {
+	$(function() {
+		var logs = logger($('#logs')),
+		socketHooks = {
+			'onConnect': function() {
+				logs.writeLine("Connected to the server sucessfully");
+			},
+			'onDisconnect': function() {
+				logs.writeLine("Disconnected from the server");
+			}
 		},
-		'onDisconnect': function() {
-			logs.writeLine("Disconnected from the server");
-		}
-	},
-	socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
-	messages = messageHandler(socketClient),
-	mainCanvas = document.getElementById('mainCanvas'),
-	local_player;
+		socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
+		messages = messageHandler(socketClient),
+		mainCanvas = $('#mainCanvas'),
+		local_player;
 
-	var listPlaceholder = document.getElementById('availablePlayers');
-	var addToPlayerList = function (nick) {
-		var playerRow = document.createElement('div');
-		playerRow.innerHTML = nick;
-		listPlaceholder.appendChild(playerRow);
+		var listPlaceholder = $('#availablePlayers');
+		var addToPlayerList = function(nick) {
+			var playerRow = $('<div/>');
+			playerRow.html(nick);
+			listPlaceholder.append(playerRow);
+		};
+
+		/*
+	var chatHandler = function (socketClient) {
+
 	};
+*/
+		var chatInput = $("#chat-box"),
+		chatLogs = $("#chat-logs");
 
-	messages.incoming.registerMessageAction("welcome", function(data) {
-		local_player = localPlayer(g, messages, data.playerID, vector2(300, 10), "img/p1.png");
-		g.addPlayer(local_player);
+		var chats = chatHandler(chatLogs, chatInput, messages, function(keyCode) {
+			if (keyCode === 13) { // Enter key
+				messages.outgoing.sendChat(local_player.ID, chatInput.val());
+				chats.clearChatInput();
+			}
+		});
 
-		addToPlayerList(data.nick);
+		messages.incoming.registerMessageAction("welcome", function(data) {
+			local_player = localPlayer(g, messages, data.ID, vector2(300, 10), "img/p1.png");
+			g.addPlayer(local_player);
+			chatInput.attr("disabled", false); // Enable the box for chat input
+		});
 
-		console.log(data);
-		//main.addPlayer("guzi");
-	});
+		messages.incoming.registerMessageAction("chat", function(data) {
+			console.log(data);
+			chats.addChatLine(data.nick, data.chatMessage);
+		});
 
-	messages.incoming.registerMessageAction("playerlist", function(data) {
-			var i = 0, j = data.playerList.length, player;
-			listPlaceholder.innerHTML = "";
+		var mainscreen = $('#main-screen');
+		mainscreen.centerScreen();
+
+		messages.incoming.registerMessageAction("playerlist", function(data) {
+			var i = 0,
+			j = data.playerList.length,
+			player;
+			listPlaceholder.html("");
 			for (; i < j; ++i) {
-			addToPlayerList(data.playerList[i].nick);
+				addToPlayerList(data.playerList[i].nick);
 			}
 
 			console.log(data);
-	});
-
-	frameTimer.tick();
-
-	var g = game(mainCanvas, function(gameObject, time) {
-		gameObject.clearCanvas();
-		//move the stuff and update
-		gameObject.forEachPlayer(function(player) {
-			player.update(time);
-			player.draw();
 		});
+
+		var g = game(mainCanvas[0], function(gameObject, time) {
+			gameObject.clearCanvas();
+			//move the stuff and update
+			gameObject.forEachPlayer(function(player) {
+				player.update(time);
+				player.draw();
+			});
+		});
+
+		var connectButton = $('#connectButton');
+		connectButton.click(function() { // Connect to the server
+			var playerName = $('#playerNameInput').val();
+			messages.outgoing.sendIntroduction(playerName);
+		});
+
+		var main = mainScreen();
+
+		socketClient.start();
 	});
-
-	var connectButton = document.getElementById('connectButton');
-	connectButton.onclick = function () { // Connect to the server
-		var playerName = document.getElementById('playerNameInput').value;
-		messages.outgoing.sendIntroduction(playerName);
-	};
-
-	var main = mainScreen();
-
-	socketClient.start();
-};
-/*
-
-	var sendButton = document.getElementById('send');
-	sendButton.onclick = function() {
-		var chatboxInput = document.getElementById('chatbox'),
-		data = chatboxInput.value;
-		if (data.indexOf("script") >= 0) {
-			alert('no scripts mate');
-			return;
-		}
-
-		socketClient.send(data);
-	};
-
-
-	var local;
-	var players = [];
-	var messages;
-
-	var serverActions = {
-		"welcome": function(obj) {
-			logs.writeLine("Welcome to the server");
-			messages = messageHandler(server, obj.playerID);
-			local = localPlayer(g, messages, obj.playerID, vector2(60, 10), "img/p1.png");
-		},
-		"log": function(obj) {
-			logs.writeLine(obj.message);
-		},
-		"playermove": function(obj) {
-
-		},
-		"playerlist": function(obj) {
-			logs.writeLine("Current players online: " + obj.list.length);
-			console.log(obj);
-		}
-	};
-
-};
-*/
+} (jQuery));
 

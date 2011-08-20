@@ -8,32 +8,55 @@
 	display:none;
 }
 
-#main {
-	width:800px;
-	height:600px;
-	margin: 0px auto;
-	display:none;
-}
-
 .screen {
 	width:800px;
 	height:600px;
 	margin: 0px auto;
 }
 
+#chat-logs {
+	border:1px solid black;
+	background-color:black;
+	font-family: ‘Lucida Console’, Monaco, monospace;
+	font-size:0.9em;
+	overflow:auto;
+	width:400px;
+	height:170px;
+}
+
+#chat-box {
+	width:400px;
+}
+
 #main-screen {
 	background-image:url('../img/main.png');
 }
 
+#game-screen {
+	margin: 0px auto;
+	display:none;
+	border:1px solid black;
+}
+
+#main-chat {
+	border:1px solid black;
+	width:400px;
+	height:200px;
+	position:absolute;
+	bottom:0px;
+	left:200px;
+}
+
 #current-players {
+	border:1px solid black;
 	background-color:yellow;
 	width:200px;
 	height:200px;
-	position:relative;
-	top:30px;
-	left:60px;
+	position:absolute;
+	bottom:0px;
+	left:0px;
 }
 
 #mainCanvas {
-	border:1px solid black;
+	
 }

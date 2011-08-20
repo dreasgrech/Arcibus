@@ -16,7 +16,8 @@ class IntrodutionMessageHandler extends IncomingMessageHandler implements iIncom
 	}
 
 	public function handle($socket, $message) {
-		$newPlayer = new Player($this->server, $socket, Player::generatePlayerID(), $message->nick);
+		$sanitizedNick = strip_tags($message->nick); // strip HTML from the input (because of the evil users)
+		$newPlayer = new Player($this->server, $socket, Player::generatePlayerID(), $sanitizedNick);
 		$this->game->addPlayer($newPlayer);
 
 		$welcomeMessage = new WelcomePlayerMessage($this->game, $newPlayer);

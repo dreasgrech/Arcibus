@@ -9,7 +9,7 @@ var messageHandler = function(client) {
 	sendMessage = function(id, action, data) {
 		data = data || {};
 		if (id) {
-		data.ID = id;
+			data.ID = id;
 		}
 		data.action = action;
 		client.send(JSON.stringify(data));
@@ -47,7 +47,15 @@ var messageHandler = function(client) {
 				});
 			},
 			sendIntroduction: function(nick) {
-						  sendMessage(false, "introduction", {nick:nick});
+				sendMessage(0, "introduction", {
+					nick: nick
+				});
+			},
+			sendChat: function(id, message) {
+				sendMessage(id, "chat", {
+					chat: message
+				});
+
 			}
 		}
 	};

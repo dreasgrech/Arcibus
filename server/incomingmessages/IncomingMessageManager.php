@@ -2,7 +2,9 @@
 
 include 'iIncomingMessageHandler.php';
 include 'IncomingMessageHandler.php';
+
 include 'IntrodutionMessageHandler.php';
+include 'ChatMessageHandler.php';
 
 class IncomingMessageManager {
 
@@ -17,6 +19,7 @@ class IncomingMessageManager {
 	public function start($server) {
 		$this->server = $server;
 		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $this->game);
+		$this->handlers["chat"] = new ChatMessageHandler($server, $this->game);
 	}
 
 	public function handleMessage($socket, $message) {

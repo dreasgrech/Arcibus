@@ -1,8 +1,14 @@
 <?php
 class Game {
 	public $players = array();
-	public function __construct() {
+	public $isInProgress;
 
+	public function __construct() {
+		$this->isInProgress = false;
+	}
+
+	public function start() {
+		$this->isInProgress = true;
 	}
 
 	public function addPlayer($player) {
@@ -21,6 +27,15 @@ class Game {
 	public function getPlayerFromSocket($socket) {
 		echo "Players: ".count($this->players).PHP_EOL;
 		return $this->players[$socket->socket];
+	}
+
+	public function getPlayerFromID($id) {
+		foreach($this->players as $player) {
+			if (strcmp($player->ID, $id) >= 0) {
+				return $player;
+			}
+		}
+		unset($player);
 	}
 
 	// Sends a message to every player

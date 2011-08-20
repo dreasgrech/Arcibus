@@ -9,7 +9,7 @@ include 'handshake.php';
  */
 class WebSocketServer extends SocketServer {
 
-	private $webSocketClients = array(); // this holds a collection of WebSocketClient instances, and is needed to manage the handshake flag.
+	private $webSocketClients = array(); // holds a collection of WebSocketClient instances, and is needed to manage the handshake flag.
 
 	public function __construct($address = 'localhost', $port = 8080, $hooks) {
 		$webSocketClients = &$this->webSocketClients;
@@ -47,7 +47,12 @@ class WebSocketServer extends SocketServer {
 						if ($hook = $hooks['onClientDisconnect']) {
 							$hook($that, $webSocket);
 						}
-					}
+					},
+						'onIteration' => function ($parent) use (&$that, $hooks) {
+							if ($hook = $hooks['onIteration']) {
+								$hook($that);
+							}
+						}
 		);
 
 		parent::__construct($address, $port, $overriddenHooks);

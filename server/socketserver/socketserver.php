@@ -96,7 +96,7 @@ class SocketServer {
 			$changedSockets = $this->sockets;
 
 			// Wait until one of the sockets in $changedSockets changes [sends something] (not sure if this comment is accurate)
-			socket_select($changedSockets, $write = NULL, $except = NULL, NULL); 
+			socket_select($changedSockets, $write = NULL, $except = NULL, 0); 
 
 			foreach($changedSockets as $socket) {
 				if ($socket == $this->masterSocket) {
@@ -124,6 +124,8 @@ class SocketServer {
 
 				$this->invokeHook('onMessage', $data, $socket);
 			}
+
+			$this->invokeHook('onIteration');
 		}
 	}
 }
