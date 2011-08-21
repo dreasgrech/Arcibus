@@ -46,6 +46,9 @@ var messageHandler = function(client) {
 					position: position
 				});
 			},
+			sendReadySignal: function(id) {
+				sendMessage(id, "ready");
+			},
 			sendIntroduction: function(nick) {
 				sendMessage(0, "introduction", {
 					nick: nick

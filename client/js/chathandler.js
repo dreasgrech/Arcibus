@@ -1,7 +1,7 @@
 var chatHandler = function(logsContainer, chatInput, messageHandler, chatInputKeypress) {
 	var createChatLine = function(nick, message) {
 		var now = new Date(),
-		datePart = $("<span/>").html(now.format("UTC:h:MM:ss")).css("color", "red").css("margin-right", 10),
+		datePart = $("<span/>").html(now.format("h:MM:ss")).css("color", "red").css("margin-right", 10),
 		nickPart = $("<span/>").html(nick).css("color", "green").css("margin-right", 10),
 		messagePart = $("<span/>").html(message).css("color", "white"),
 		line = $("<div/>");

@@ -8,13 +8,6 @@
  */
 class IntrodutionMessageHandler extends IncomingMessageHandler implements iIncomingMessageHandler{
 
-	private $game;
-
-	public function __construct($server, $game) {
-		parent::__construct($server);
-		$this->game = $game;
-	}
-
 	public function handle($socket, $message) {
 		$sanitizedNick = strip_tags($message->nick); // strip HTML from the input (because of the evil users)
 		$newPlayer = new Player($this->server, $socket, Player::generatePlayerID(), $sanitizedNick);

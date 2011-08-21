@@ -1,31 +1,49 @@
-#logs {
-	width: 500px;
-	height: 250px;
-	color: white;
-	background-color:black;
+body {
 	font-family: ‘Lucida Console’, Monaco, monospace;
-	overflow:auto;
-	display:none;
+}
+
+#viewport {
+	border-top-right-radius: 15px;
+	border-top-left-radius: 15px;
+	border:3px solid black;
+	width:800px;
+	height:600px;
 }
 
 .screen {
 	width:800px;
 	height:600px;
 	margin: 0px auto;
+	border-top-right-radius: inherit;
+	border-top-left-radius: inherit;
 }
 
 #chat-logs {
-	border:1px solid black;
 	background-color:black;
-	font-family: ‘Lucida Console’, Monaco, monospace;
 	font-size:0.9em;
 	overflow:auto;
-	width:400px;
-	height:170px;
+	height:150px;
+	opacity:0.8;
+	padding:10px;
 }
 
 #chat-box {
-	width:400px;
+	height:30px;
+	width:625px;
+	margin:0px;
+	padding:0px;
+	border:0px;
+	background-color:#7A7A7A;
+	padding-left:10px;
+	opacity:0.8;
+	color:#660000;
+	font-weight:bold;
+}
+
+#overlay-roots {
+	background-image:url('../img/overlay-roots.png');
+	position:absolute;
+	pointer-events:none; /* http://stackoverflow.com/questions/3680429/click-through-a-div-to-underlying-elements */
 }
 
 #main-screen {
@@ -35,26 +53,39 @@
 #game-screen {
 	margin: 0px auto;
 	display:none;
-	border:1px solid black;
 }
 
 #main-chat {
-	border:1px solid black;
-	width:400px;
+	width:625px;
 	height:200px;
 	position:absolute;
 	bottom:0px;
-	left:200px;
+	left:175px;
 }
 
 #current-players {
-	border:1px solid black;
-	background-color:yellow;
-	width:200px;
-	height:200px;
+	background-image:url('../img/wood.png');
+	padding:10px;
+	width:155px;
+	height:180px;
 	position:absolute;
 	bottom:0px;
 	left:0px;
+	color:white;
+	font-size:11px;
+}
+
+#player-name-choose {
+	height:30px;
+	border:1px solid black;
+	padding:5px;
+	position:absolute;
+	color:white;
+	left: 20px;
+	background-color:#330000;
+	border-bottom-right-radius: 15px;
+	border-bottom-left-radius: 15px;
+	opacity:0.8;
 }
 
 #mainCanvas {

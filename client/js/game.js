@@ -25,7 +25,10 @@ var game = function(canvasElement, step) {
 		clearCanvas: function() {
 			context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 		},
-		stepInterval: stepInterval
+		stepInterval: stepInterval,
+			      update: function (time) {
+
+			      }
 	};
 
 	frameTimer.tick();

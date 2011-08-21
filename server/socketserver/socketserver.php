@@ -125,7 +125,7 @@ class SocketServer {
 				$this->invokeHook('onMessage', $data, $socket);
 			}
 
-			$this->invokeHook('onIteration');
+			$this->invokeHook('onIteration', $this);
 		}
 	}
 }

@@ -25,13 +25,13 @@ class Game {
 	}
 
 	public function getPlayerFromSocket($socket) {
-		echo "Players: ".count($this->players).PHP_EOL;
 		return $this->players[$socket->socket];
 	}
 
 	public function getPlayerFromID($id) {
 		foreach($this->players as $player) {
-			if (strcmp($player->ID, $id) >= 0) {
+			if ($player->ID == $id) {
+			//if (strcmp($player->ID, $id) >= 0) {
 				return $player;
 			}
 		}
@@ -55,6 +55,25 @@ class Game {
 			$player->sendMessage($message);
 		}
 		unset($player);
+	}
+
+	private function iteratePlayers($callback) {
+		foreach($this->players as $player) {
+			$callback($player);
+		}
+
+		unset($player);
+	}
+
+	public function numberOfReadyPlayers() {
+		$total = 0;
+		$this->iteratePlayers(function ($player) use (&$total){
+			if ($player->ready) {
+				$total++;
+			}
+		});
+
+		return $total;
 	}
 }
 ?>

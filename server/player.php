@@ -4,6 +4,7 @@ class Player {
 	public $ID;
 	public $socket;
 
+	public $ready = false;
 	public $nick;
 	public $position;
 

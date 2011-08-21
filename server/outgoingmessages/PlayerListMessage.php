@@ -9,9 +9,14 @@ class PlayerListMessage extends OutgoingMessage {
 
 	public function __toString() { 
 		$players = JSONConstruction::constructJSONArray($this->playerList,  function ($key, $value) {
-			return JSONConstruction::constructJSONObject(array("nick"=>$value->nick));
+			return JSONConstruction::constructJSONObject(array(
+				"nick" => $value->nick,
+				"ready" => $value->ready
+			));
 		});
-		return $this->manuallyConstructMessage(array("playerList"=>$players));
+		return $this->manuallyConstructMessage(array(
+			"playerList" => $players
+		));
 	}
 }
 ?>

@@ -1,6 +1,6 @@
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/main.css"/>
 </head>
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -20,35 +20,36 @@
 <script src="js/keyHandler.js"></script>
 <script src="js/vector2.js"></script>
 <script src="js/main.js"></script>
-
 <!--
 <input id="chatbox" type="text"/>
 <input type="button" id="send" value="Send"/>
 <div id="logs">
 </div>
 -->
+<div id="viewport">
 <div id="game-screen" class="screen">
 	<canvas id="mainCanvas"></canvas>
 </div>
-
 <div id="main-screen" class="screen">
 	<div id="player-name-choose">
 		 Enter your name: <input type="text" id="playerNameInput"/><input type="button" value="Connect" id="connectButton"/>
+		<input type="button" value="Ready" id="readyButton" disabled/>
 	</div>
 	<div id="current-players">
-		<div>
+		<div style="text-align: center">
 			<b>Available Players</b>
 		</div>
-		<div id="availablePlayers">
+		<div id="availablePlayers" style="margin-top: 5px">
 		</div>
 	</div>
-<div id="main-chat">
-<div id="chat-logs">
-
-</div>
-<div id="chat-input">
-<input id="chat-box" type="text" disabled/>
-</div>
+	<div id="main-chat">
+		<div id="chat-logs">
+		</div>
+		<div id="chat-input">
+			<input id="chat-box" type="text" disabled/>
+		</div>
+	</div>
+	<div id="overlay-roots" class="screen"> </div>
 </div>
 </div>
 </body>
