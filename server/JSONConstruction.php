@@ -4,7 +4,16 @@ class JSONConstruction {
 	public function constructJSONObject ($data) {
 		return JSONConstruction::construct($data, function ($key, $value) {
 			$json = '"' . $key . '" : ';
-			if (!(strcmp($value[0],"[") && strcmp($value[strlen($value) - 1],"]"))) { // check to see if the current $value is not a JSON array, because if it is, we don't want to surround it with "
+
+			// check to see if the current $value is not a JSON array or object, 
+			// because if it is, we don't want to surround it with ".
+			$firstCharacter = $value[0];
+			$lastCharacter = $value[strlen($value) - 1];
+
+			if (
+				!(strcmp($firstCharacter,"[") && strcmp($lastCharacter,"]")) || // ARRAY
+				!(strcmp($firstCharacter,"{") && strcmp($lastCharacter,"}"))    // OBJECT
+			) { 
 				return $json .= $value;
 			}
 
@@ -17,6 +26,7 @@ class JSONConstruction {
 			return $callback($key, $value);
 		}, "[", "]");
 	}
+
 	private static function construct($elements, $enumerationCallback, $openingBrace, $closingBrace) {
 		$serialized = array();
 		$serialized[] = $openingBrace;

@@ -1,11 +1,9 @@
 <?php
 class WelcomePlayerMessage extends OutgoingMessage {
-	public $game;
 	public $user;
 
-	public function __construct($game, $user) {
+	public function __construct($user) {
 		parent::__construct("welcome");
-		$this->game = $game;
 		$this->user = $user;
 	}
 

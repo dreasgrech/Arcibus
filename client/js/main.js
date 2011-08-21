@@ -10,22 +10,29 @@
 		},
 		socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
 		messages = messageHandler(socketClient),
-		mainCanvas = $('#mainCanvas');
+		currentGame,
+		localUserID;
 
 		messages.incoming.registerMessageAction("welcome", function(data) {
-			main.initiateLocalUser(data.ID, data.nick);
+			localUserID = data["ID"];
+			main.initiateLocalUser(data["ID"], data["nick"]);
 		});
 
 		messages.incoming.registerMessageAction("chat", function(data) {
-			main.addChatLine(data.nick, data.chatMessage);
+			main.addChatLine(data["nick"], data["chatMessage"]);
 		});
 
 		messages.incoming.registerMessageAction("startgame", function(data) {
-			alert("Starting the game");
+				currentGame = game(messages, data["players"], localUserID);
+				main.hide();
 		});
 
 		messages.incoming.registerMessageAction("userlist", function(data) {
 				main.updateUserList(data["users"]);
+		});
+
+		messages.incoming.registerMessageAction("snapshot", function(data) {
+				currentGame.applySnapshot(data);
 		});
 
 		document.addEventListener('touchmove', function(event) {
@@ -38,17 +45,6 @@
 		false);
 
 		$('#viewport').centerScreen();
-
-		/*
-		var g = game(mainCanvas[0], function(gameObject, time) {
-			gameObject.clearCanvas();
-			//move the stuff and update
-			gameObject.forEachPlayer(function(player) {
-				player.update(time);
-				player.draw();
-			});
-		});
-		*/
 
 		var main = mainScreen(messages);
 

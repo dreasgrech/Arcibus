@@ -6,6 +6,7 @@ include 'IncomingMessageHandler.php';
 include 'IntrodutionMessageHandler.php';
 include 'ChatMessageHandler.php';
 include 'ReadySignalHandler.php';
+include 'PlayerMovedMessageHandler.php';
 
 class IncomingMessageManager {
 
@@ -25,6 +26,8 @@ class IncomingMessageManager {
 		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $this->game, $this->userList);
 		$this->handlers["chat"] = new ChatMessageHandler($server, $this->game, $this->userList);
 		$this->handlers["ready"] = new ReadySignalHandler($server, $this->game, $this->userList);
+		$this->handlers["moved"] = new PlayerMovedMessageHandler($server, $this->game, $this->userList);
+
 	}
 
 	public function handleMessage($socket, $message) {

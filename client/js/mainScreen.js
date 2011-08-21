@@ -1,16 +1,6 @@
-/*var screen = function(game) {
-	var obj = {
-		game: game,
-		update: function(time) {},
-		draw: function(time) {}
-	};
-
-	return obj;
-};
-*/
-
 var mainScreen = function(messages) {
-	var readyButton = $("#readyButton"),
+	var screen = $("#main-screen"),
+	readyButton = $("#readyButton"),
 	chatInput = $("#chat-box"),
 	chatLogs = $("#chat-logs"),
 	listPlaceholder = $('#availableUsers'),
@@ -61,7 +51,6 @@ var mainScreen = function(messages) {
 		messages.outgoing.sendIntroduction(userName);
 	});
 
-
 	return {
 		initiateLocalUser: function(id, nick) {
 			local = localUser(id, nick);
@@ -80,6 +69,8 @@ var mainScreen = function(messages) {
 			for (; i < j; ++i) {
 				addToUserList(users[i]);
 			}
+		}, hide: function () {
+			screen.hide();
 		}
 	};
 };

@@ -9,16 +9,33 @@ class Game {
 	}
 
 	public function start($users) {
-		$startMessage = new StartGameMessage();
 		foreach($users as $user) {
-			$newPlayer = new Player($user);
+			$position = new Vector2(rand(10,400), rand(10,400));
+			$newPlayer = new Player($user, $position);
 			$this->addPlayer($newPlayer);
 			$user->inGame = true;
-
-			$newPlayer->sendMessage($startMessage);
 		}
+		unset($user);
+
+		$startMessage = new StartGameMessage($this);
+		$this->iteratePlayers(function ($player) use($startMessage) {
+			$player->sendMessage($startMessage);
+		});
 
 		$this->isInProgress = true;
+	}
+
+	public function handlePlayerMoved($player, $direction) {
+		if ($direction === "left") {
+			$player->moveLeft();
+		} else {
+			$player->moveRight();
+		}
+	}
+
+	public function createSnapshot() {
+		$snapshotMessage = new WorldSnapshotMessage($this);
+		return $snapshotMessage;
 	}
 
 	public function addPlayer($player) {
@@ -64,7 +81,7 @@ class Game {
 		unset($player);
 	}
 
-	private function iteratePlayers($callback) {
+	public function iteratePlayers($callback) {
 		foreach($this->players as $player) {
 			$callback($player);
 		}

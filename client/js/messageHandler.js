@@ -42,9 +42,9 @@ var messageHandler = function(client) {
 			}*/
 		},
 		outgoing: {
-			sendMovedMessage: function(id, position) {
+			sendMovedMessage: function(id, direction) {
 				sendMessage(id, "moved", {
-					position: position
+					direction: direction
 				});
 			},
 			sendReadySignal: function(id) {
