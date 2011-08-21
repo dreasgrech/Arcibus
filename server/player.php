@@ -1,32 +1,23 @@
 <?php
 class Player {
-	public $server;
-	public $ID;
 	public $socket;
-
-	public $ready = false;
-	public $nick;
 	public $position;
 
-	public function __construct($server, $socket, $id, $nick) {
-		$this->server = $server;
-		$this->socket = $socket;
-		$this->ID = $id;
-		$this->nick = $nick;
+	private $user;
+
+	public function __construct($user) {
+		$this->socket = $user->socket;
+		$this->user = $user;
 	}
 
 	public function sendMessage($message) {
-		$this->socket->send($message);
+		$this->user->socket->send($message);
 	}
 
-	public static function generatePlayerID() {
-		return Player::getGUID();
+	/*
+	public function getNick() {
+		return $this->user->nick;
 	}
-
-	private static function getGUID() {
-		return trim(com_create_guid(), '{}');
-	}
-
-
+	 */
 }
 ?>

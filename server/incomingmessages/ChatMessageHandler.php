@@ -3,9 +3,9 @@
 class ChatMessageHandler extends IncomingMessageHandler implements iIncomingMessageHandler{
 
 	public function handle($socket, $message) {
-		$player = $this->game->getPlayerFromSocket($socket);
+		$user = $this->userList->getUserFromSocket($socket);
 		$chatMessage = strip_tags($message->chat); // Sanitize the chat message to remove html tags evil users WILL send.
-		$chatMessage = new ChatMessage($player->nick, $chatMessage);
+		$chatMessage = new ChatMessage($user->nick, $chatMessage);
 		$this->server->broadcast($chatMessage);
 	}
 }

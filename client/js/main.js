@@ -1,12 +1,11 @@
 (function($) {
 	$(function() {
-		var logs = logger($('#logs')),
-		socketHooks = {
+		var socketHooks = {
 			'onConnect': function() {
-				logs.writeLine("Connected to the server sucessfully");
+				//logs.writeLine("Connected to the server sucessfully");
 			},
 			'onDisconnect': function() {
-				logs.writeLine("Disconnected from the server");
+				//logs.writeLine("Disconnected from the server");
 			}
 		},
 		socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
@@ -20,14 +19,17 @@
 		playerNameInput = $('#playerNameInput');
 
 		var addToPlayerList = function(player) {
-			var playerRow = $('<div/>');
-			console.log(player.ready);
-			if (player.ready) {
+			var playerRow = $('<div/>'), color = "white";
+			if (player.inGame) {
+				color = "red";
+			} else if (player.ready) {
+				color = "green";
+			}
+
 				playerRow.css({
 					"font-weight": "bold",
-					"color": "red"
+					"color": color
 				});
-			}
 
 			playerRow.html(player.nick);
 			listPlaceholder.append(playerRow);
@@ -50,7 +52,6 @@
 			g.addPlayer(local_player);
 			chatInput.attr("disabled", false); // Enable the box for chat input
 			readyButton.attr("disabled", false); // Enable the ready button
-			chats.addChatLine("ADMIN", "New player: " + local_player.ID);
 		});
 
 		messages.incoming.registerMessageAction("chat", function(data) {
@@ -62,16 +63,14 @@
 			alert("Starting the game");
 		});
 
-		messages.incoming.registerMessageAction("playerlist", function(data) {
+		messages.incoming.registerMessageAction("userlist", function(data) {
 			var i = 0,
-			j = data.playerList.length,
+			j = data["users"].length,
 			player;
 			listPlaceholder.html("");
 			for (; i < j; ++i) {
-				addToPlayerList(data.playerList[i]);
+				addToPlayerList(data["users"][i]);
 			}
-
-			console.log(data);
 		});
 
 		document.addEventListener('touchmove', function(event) {

@@ -12,17 +12,19 @@ class IncomingMessageManager {
 	private $handlers = array();
 	private $server;
 	private $game;
+	private $userList;
 
-	public function __construct($game) {
+	public function __construct($game, $userList) {
 		$this->game = $game;
+		$this->userList = $userList;
 	}
 
 	public function start($server) {
 		$this->server = $server;
 
-		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $this->game);
-		$this->handlers["chat"] = new ChatMessageHandler($server, $this->game);
-		$this->handlers["ready"] = new ReadySignalHandler($server, $this->game);
+		$this->handlers["introduction"] = new IntrodutionMessageHandler($server, $this->game, $this->userList);
+		$this->handlers["chat"] = new ChatMessageHandler($server, $this->game, $this->userList);
+		$this->handlers["ready"] = new ReadySignalHandler($server, $this->game, $this->userList);
 	}
 
 	public function handleMessage($socket, $message) {

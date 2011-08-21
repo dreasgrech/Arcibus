@@ -41,13 +41,13 @@ body {
 }
 
 #overlay-roots {
-	background-image:url('../img/overlay-roots.png');
+	background-image:url('../img/main/overlay-roots.png');
 	position:absolute;
-	pointer-events:none; /* http://stackoverflow.com/questions/3680429/click-through-a-div-to-underlying-elements */
+	pointer-events:none; /* As to allow click-trough [http://stackoverflow.com/questions/3680429/click-through-a-div-to-underlying-elements] */
 }
 
 #main-screen {
-	background-image:url('../img/main.png');
+	background-image:url('../img/main/main.png');
 }
 
 #game-screen {
@@ -64,7 +64,7 @@ body {
 }
 
 #current-players {
-	background-image:url('../img/wood.png');
+	background-image:url('../img/main/wood.png');
 	padding:10px;
 	width:155px;
 	height:180px;
@@ -73,6 +73,10 @@ body {
 	left:0px;
 	color:white;
 	font-size:11px;
+}
+
+#availablePlayers {
+	font-size:15px;
 }
 
 #player-name-choose {

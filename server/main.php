@@ -1,11 +1,6 @@
 <?php
 error_reporting(E_ALL);
 
-/*function __autoload($className){
-	echo $className;
-	require_once $className.'.php';
-}*/
-
 include 'socketserver/websocketserver.php';
 include 'JSONConstruction.php';
 include 'StringUtils.php';
@@ -14,55 +9,62 @@ include 'player.php';
 include 'outgoingmessages/OutgoingMessage.php';
 include 'outgoingmessages/WelcomePlayerMessage.php';
 include 'outgoingmessages/ChatMessage.php';
-include 'outgoingmessages/PlayerListMessage.php';
+include 'outgoingmessages/UserListMessage.php';
 include 'outgoingmessages/StartGameMessage.php';
 include 'incomingmessages/incomingmessagemanager.php';
 include 'vector2.php';
 include 'game.php';
+include 'user.php';
+include 'UserList.php';
 
 $address = '192.168.1.5';
 $port = 8000;
 
 $logger = new Logger();
+$users = new UserList();
 $game = new Game();
 
-$messageHandler = new IncomingMessageManager(&$game);
+$messageHandler = new IncomingMessageManager(&$game, &$users);
 
 $hooks = array(
 	'onClientConnect' => function ($s, $socket) use ($logger) {
 		$ip = $s->getIPAddress($socket);
 		$logger->logServerAction("New client connected: " . $ip);
 	}, 
-		'onClientHandshaked' => function ($s, $socket) use (&$game, $logger) { // At this point, the client is not a player yet
+		'onClientHandshaked' => function ($s, $socket) use (&$game, &$users, $logger) { // At this point, the client is not a user yet
 			$ip = $s->getIPAddress($socket);
 			$logger->logServerAction("Handshaked with " . $ip);
 
-			$playerListMessage = new PlayerListMessage($game->players);
-			$socket->send($playerListMessage);
+			$userListMessage = new UserListMessage($users->users);
+			$socket->send($userListMessage);
 		},
-			'onClientDisconnect' => function ($s, $socket) use ($logger, &$game) {
+			'onClientDisconnect' => function ($s, $socket) use (&$game, &$users, $logger) {
 				//$ip = $s->getIPAddress($socket);
 				//$logger->logServerAction("Client disconnected: " . $ip);
-				if ($game->isPlayer($socket)) {
-					$player = $game->getPlayerFromSocket($socket);
-					$game->removePlayer($player);
+				if ($users->isUser($socket)) {
+					$user = $users->getUserFromSocket($socket);
+					$users->removeUser($user);
 
-					$playerListMessage = new PlayerListMessage($game->players);
-					$s->broadcast($playerListMessage);
+					$userListMessage = new UserListMessage($users->users);
+					$s->broadcast($userListMessage);
 				}
-			}, 'onMessage' => function ($s, $message, $socket) use (&$game, &$messageHandler, $logger) {
+			}, 'onMessage' => function ($s, $message, $socket) use (&$messageHandler, $logger) {
 				$data = json_decode($message);
 				$ip = $s->getIPAddress($socket);
 				$logger->logMessageRecieved($ip, $message);
 				$messageHandler->handleMessage($socket, $data);
 			},
-				'onIteration' => function ($s) use (&$game, $logger) {
-					if ($game->numberOfReadyPlayers() == 4 && !$game->isInProgress) {
+				'onIteration' => function ($s) use (&$game, &$users, $logger) {
+					$available = $users->getReadyUsers(4);
+					if (!$game->isInProgress && count($available) > 0) { // Ready to start the game because a game is not in progress and there are enough players to start a game
 						$logger->logServerAction("Starting the game");
-						$startMessage = new StartGameMessage();
-						$s->broadcast($startMessage);
-						$game->start();
+
+						$game->start($available);
+
+						$userListMessage = new UserListMessage($users->users);
+						$s->broadcast($userListMessage);
 					}
+
 				});
 $server = new WebSocketServer($address, $port, $hooks); 
 $messageHandler->start(&$server);
