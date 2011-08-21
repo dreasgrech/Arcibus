@@ -15,6 +15,7 @@
 <script src="js/game.js"></script>
 <script src="js/screen.js"></script>
 <script src="js/player.js"></script>
+<script src="js/localUser.js"></script>
 <script src="js/localPlayer.js"></script>
 <script src="js/keys.js"></script>
 <script src="js/keyHandler.js"></script>
@@ -26,15 +27,15 @@
 	<canvas id="mainCanvas"></canvas>
 </div>
 <div id="main-screen" class="screen">
-	<div id="player-name-choose">
-		 Enter your name: <input type="text" id="playerNameInput"/><input type="button" value="Connect" id="connectButton"/>
+	<div id="user-name-choose">
+		 Name: <input type="text" id="userNameInput"/><input type="button" value="Connect" id="connectButton"/>
 		<input type="button" value="Ready" id="readyButton" disabled/>
 	</div>
-	<div id="current-players">
+	<div id="current-users">
 		<div style="text-align: center">
-			<b>Available Players</b>
+			<b>Users</b>
 		</div>
-		<div id="availablePlayers" style="margin-top: 5px">
+		<div id="availableUsers" style="margin-top: 5px">
 		</div>
 	</div>
 	<div id="main-chat">

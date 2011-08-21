@@ -10,53 +10,14 @@
 		},
 		socketClient = webSocketClient('ws://uploadz.myftp.org:8000', socketHooks),
 		messages = messageHandler(socketClient),
-		mainCanvas = $('#mainCanvas'),
-		local_player,
-		readyButton = $("#readyButton"),
-		chatInput = $("#chat-box"),
-		chatLogs = $("#chat-logs"),
-		listPlaceholder = $('#availablePlayers'),
-		playerNameInput = $('#playerNameInput');
-
-		var addToPlayerList = function(player) {
-			var playerRow = $('<div/>'), color = "white";
-			if (player.inGame) {
-				color = "red";
-			} else if (player.ready) {
-				color = "green";
-			}
-
-				playerRow.css({
-					"font-weight": "bold",
-					"color": color
-				});
-
-			playerRow.html(player.nick);
-			listPlaceholder.append(playerRow);
-		};
-
-		var chats = chatHandler(chatLogs, chatInput, messages, function(keyCode) {
-			if (keyCode === 13) { // Enter key
-				messages.outgoing.sendChat(local_player.ID, chatInput.val());
-				chats.clearChatInput();
-			}
-		});
-
-		readyButton.click(function() {
-			messages.outgoing.sendReadySignal(local_player.ID);
-			readyButton.attr("disabled", true); // Disable the ready button
-		});
+		mainCanvas = $('#mainCanvas');
 
 		messages.incoming.registerMessageAction("welcome", function(data) {
-			local_player = localPlayer(g, messages, data.ID, vector2(300, 10), "img/p1.png");
-			g.addPlayer(local_player);
-			chatInput.attr("disabled", false); // Enable the box for chat input
-			readyButton.attr("disabled", false); // Enable the ready button
+			main.initiateLocalUser(data.ID, data.nick);
 		});
 
 		messages.incoming.registerMessageAction("chat", function(data) {
-			console.log(data);
-			chats.addChatLine(data.nick, data.chatMessage);
+			main.addChatLine(data.nick, data.chatMessage);
 		});
 
 		messages.incoming.registerMessageAction("startgame", function(data) {
@@ -64,13 +25,7 @@
 		});
 
 		messages.incoming.registerMessageAction("userlist", function(data) {
-			var i = 0,
-			j = data["users"].length,
-			player;
-			listPlaceholder.html("");
-			for (; i < j; ++i) {
-				addToPlayerList(data["users"][i]);
-			}
+				main.updateUserList(data["users"]);
 		});
 
 		document.addEventListener('touchmove', function(event) {
@@ -84,6 +39,7 @@
 
 		$('#viewport').centerScreen();
 
+		/*
 		var g = game(mainCanvas[0], function(gameObject, time) {
 			gameObject.clearCanvas();
 			//move the stuff and update
@@ -92,25 +48,9 @@
 				player.draw();
 			});
 		});
+		*/
 
-		var validatePlayerName = function (name) {
-			return name.length > 0 && name.length <= 10;
-		};
-
-		var connectButton = $('#connectButton');
-		connectButton.click(function() { // Connect to the server
-			var playerName = playerNameInput.val();
-			if (!validatePlayerName(playerName)) {
-				alert("That name is not available");
-				return;
-			}
-
-			messages.outgoing.sendIntroduction(playerName);
-			connectButton.attr("disabled", true); // Disable the Connect button
-			playerNameInput.attr("disabled", true); // Disable the name input box
-		});
-
-		var main = mainScreen();
+		var main = mainScreen(messages);
 
 		socketClient.start();
 	});

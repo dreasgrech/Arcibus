@@ -63,7 +63,7 @@ body {
 	left:175px;
 }
 
-#current-players {
+#current-users {
 	background-image:url('../img/main/wood.png');
 	padding:10px;
 	width:155px;
@@ -72,24 +72,23 @@ body {
 	bottom:0px;
 	left:0px;
 	color:white;
-	font-size:11px;
-}
-
-#availablePlayers {
 	font-size:15px;
 }
 
-#player-name-choose {
-	height:30px;
-	border:1px solid black;
-	padding:5px;
+#availableUsers {
+	font-size:13px;
+}
+
+#user-name-choose {
+	height:52px;
+	width:417px;
+	padding-left:60px;
+	padding-top:5px;
 	position:absolute;
 	color:white;
 	left: 20px;
-	background-color:#330000;
-	border-bottom-right-radius: 15px;
-	border-bottom-left-radius: 15px;
-	opacity:0.8;
+	background-image:url('../img/main/usernameinput-background.png');
+	opacity:1;
 }
 
 #mainCanvas {

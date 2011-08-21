@@ -1,4 +1,4 @@
-var chatHandler = function(logsContainer, chatInput, messageHandler, chatInputKeypress) {
+var chatHandler = function(logsContainer, chatInput, chatInputKeypress) {
 	var createChatLine = function(nick, message) {
 		var now = new Date(),
 		datePart = $("<span/>").html(now.format("h:MM:ss")).css("color", "red").css("margin-right", 10),
