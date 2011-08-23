@@ -20,31 +20,27 @@ include 'UserList.php';
 
 class Timer {
 
-	public function hasSecondsPassedSince($secondsPassed, $since) { //TODO: continue working here
-		$now = $this->now();
+	public function hasSecondsPassedSince($secondsPassed, $since) {
+		$now = $this->nowInMilliseconds();
+		//echo $now - $since . PHP_EOL;
+		//echo "$now $since $secondsPassed" . PHP_EOL;
 		return ($now - $since) >= $secondsPassed;
 	}
 
-	public function now() {
-		return $this->milliseconds();
+	public function nowInMilliseconds() {
+		return round(microtime(true) * 1000);
 	}
-
-	private function milliseconds() 
-	{ 
-		$m = explode(' ',microtime()); 
-		return (int)round($m[0]*1000,3); 
-	} 
 }
 
+
 $timer = new Timer();
-$lastSnapshot = $timer->now();
+$lastSnapshot = $timer->nowInMilliseconds();
 
 $address = '192.168.1.5';
 $port = 8000;
 
 $logger = new Logger();
 $users = new UserList();
-$game = NULL;
 
 $game = new Game();
 $messageHandler = new IncomingMessageManager(&$game, &$users);
@@ -84,7 +80,7 @@ $hooks = array(
 				$messageHandler->handleMessage($socket, $data);
 			},
 				'onIteration' => function ($s) use (&$game, &$users, $logger, $timer, &$lastSnapshot) {
-					$available = $users->getReadyUsers(2);
+					$available = $users->getReadyUsers(1);
 					if (!$game->isInProgress && count($available) > 0) { // Ready to start the game because a game is not in progress and there are enough players to start a game
 						$logger->logServerAction("Starting the game");
 
@@ -93,11 +89,17 @@ $hooks = array(
 						$userListMessage = new UserListMessage($users->users);
 						$s->broadcast($userListMessage);
 					}
+/*
+						if ($timer->hasSecondsPassedSince(500, $lastSnapshot)) {
+							echo "hello" . PHP_EOL;
+							$lastSnapshot = $timer->nowInMilliseconds();
+						}
+*/
 
 					if ($game->isInProgress) {
-						if ($timer->hasSecondsPassedSince(10, $lastSnapshot)) {
+						if ($timer->hasSecondsPassedSince(50, $lastSnapshot)) {
 							$logger->logServerAction("SNAPSHOT");
-							$lastSnapshot = $timer->now();
+							$lastSnapshot = $timer->nowInMilliseconds();
 							$snapshot = $game->createSnapshot();
 							$game->iteratePlayers(function ($player) use ($snapshot) {
 								$player->sendMessage($snapshot);

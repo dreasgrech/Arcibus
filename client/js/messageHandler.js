@@ -23,7 +23,8 @@ var messageHandler = function(client) {
 			console.log("Error parsing message to JSON => " + data);
 			return;
 		}
-		console.log(message);
+
+		//console.log(message);
 
 		action = registeredCallbacks[message.action];
 		if (action) {

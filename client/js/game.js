@@ -22,7 +22,7 @@ var game = function(messages, playerList, localUserID) {
 		return list;
 	} ()),
 	gameScreen = $("#game-screen"),
-	stepInterval = 100,
+	stepInterval = 10,
 	clearCanvas = function() {
 		context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 	},
@@ -42,7 +42,7 @@ var game = function(messages, playerList, localUserID) {
 		drawImageOnCanvas(backgroundImage, 0, 0);
 		//move the stuff and update
 		forEachPlayer(function(player) {
-			//player.update(time);
+			player.update(time);
 			player.draw();
 		});
 
@@ -80,7 +80,8 @@ var game = function(messages, playerList, localUserID) {
 			var updatedPlayers = snapshot.players;
 			forEachPlayer(function(player) {
 				var updatedPlayer = updatedPlayers[player.ID];
-				player.setPosition(updatedPlayer.position.x, updatedPlayer.position.y);
+				player.addPosition(updatedPlayer.position);
+				//player.setPosition(updatedPlayer.position.x, updatedPlayer.position.y);
 			});
 		}
 	};

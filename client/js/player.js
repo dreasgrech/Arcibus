@@ -1,8 +1,14 @@
+
 var player = function(context, id, nick, initialPosition) {
+var lerp = function(x1, x2, w) {
+	return x1 + (x2 - x1) * w;
+};
 	var position = initialPosition,
 	image = new Image();
 	image.onload = function() {};
-	image.src = 'img/game/player.png'
+	image.src = 'img/game/player.png';
+
+	var oldPos = position, newPos = position, lerpValue = 0;
 
 	return {
 		ID: id,
@@ -15,12 +21,32 @@ var player = function(context, id, nick, initialPosition) {
 			position.y = y;
 		},
 		draw: function(time) {
-			      context.drawImage(image, position.x, position.y);
+			context.drawImage(image, position.x, position.y);
+		},
+		update: function(time) {
+				if (lerpValue <= 1) {
+					//console.log(position.x, newPos.x, lerpValue, lerp(position.x, newPos.x, lerpValue));
+					position.x = lerp(+oldPos.x, +newPos.x, lerpValue);
+					lerpValue += 0.2;
+				}
+
+				if (lerpValue >= 1) {
+					lerpValue = 0;
+				}
+		},
+		addPosition: function(newPosition) {
+				     if (+newPosition.x === +position.x) {
+					     return;
+				     }
+
+				     oldPos = position;
+				     newPos = newPosition;
+				     lerpValue = 0;
 		}
 	};
 };
 
-	/*
+/*
 var player = function(game, id, initialPosition, imagePath) {
 	var position = initialPosition,
 	angle = 0,
@@ -54,5 +80,4 @@ var player = function(game, id, initialPosition, imagePath) {
 	};
 };
 */
-	
 
