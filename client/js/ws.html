@@ -1,0 +1,15 @@
+<script src="websocketclient.js"></script>
+<script>
+	var client = webSocketClient("ws://uploadz.myftp.org:8000", {
+		'onConnect': function() {
+			console.log('connect');
+		},
+		'onDisconnect': function() {
+			console.log('disconnect');
+		},
+		'onMessage': function() {
+			console.log('message');
+		}
+	});
+	client.start();
+</script>

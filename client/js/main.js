@@ -35,15 +35,6 @@
 				currentGame.applySnapshot(data);
 		});
 
-		document.addEventListener('touchmove', function(event) {
-			//event.preventDefault();
-			var touch = event.touches[0];
-			if (local_player) {
-				messages.outgoing.sendChat(local_player.ID, "Touch x:" + touch.pageX + ", y:" + touch.pageY);
-			}
-		},
-		false);
-
 		$('#viewport').centerScreen();
 
 		var main = mainScreen(messages);

@@ -9,11 +9,13 @@ var webSocketClient = function(url, hooks) {
 	return {
 availableHooks:availableHooks,
 		start: function() {
-			if (!window["WebSocket"]) {
+			if(window["WebSocket"]) {
+				connection = new WebSocket(url);
+			} else if (window["MozWebSocket"]) {
+				connection = new MozWebSocket(url);
+			} else {
 				throw "Your browser does not support sockets";
 			}
-
-			connection = new WebSocket(url);
 
 			connection.onopen = function() {
 				if (hooks[availableHooks.onConnect]) {

@@ -80,7 +80,7 @@ $hooks = array(
 				$messageHandler->handleMessage($socket, $data);
 			},
 				'onIteration' => function ($s) use (&$game, &$users, $logger, $timer, &$lastSnapshot) {
-					$available = $users->getReadyUsers(1);
+					$available = $users->getReadyUsers(2);
 					if (!$game->isInProgress && count($available) > 0) { // Ready to start the game because a game is not in progress and there are enough players to start a game
 						$logger->logServerAction("Starting the game");
 
@@ -98,7 +98,7 @@ $hooks = array(
 
 					if ($game->isInProgress) {
 						if ($timer->hasSecondsPassedSince(50, $lastSnapshot)) {
-							$logger->logServerAction("SNAPSHOT");
+							//$logger->logServerAction("SNAPSHOT");
 							$lastSnapshot = $timer->nowInMilliseconds();
 							$snapshot = $game->createSnapshot();
 							$game->iteratePlayers(function ($player) use ($snapshot) {

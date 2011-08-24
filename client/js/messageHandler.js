@@ -25,7 +25,6 @@ var messageHandler = function(client) {
 		}
 
 		//console.log(message);
-
 		action = registeredCallbacks[message.action];
 		if (action) {
 			action(message);
@@ -46,6 +45,11 @@ var messageHandler = function(client) {
 			sendMovedMessage: function(id, direction) {
 				sendMessage(id, "moved", {
 					direction: direction
+				});
+			},
+			sendStateMessage: function(id, position) {
+				sendMessage(id, "playerstate", {
+					position: position
 				});
 			},
 			sendReadySignal: function(id) {

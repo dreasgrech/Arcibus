@@ -8,21 +8,29 @@ var game = function(messages, playerList, localUserID) {
 	canvasElement.width = 800;
 	canvasElement.height = 600;
 
+
+	var FRAME_RATE=100,  stepInterval=1000/FRAME_RATE;
+
 	var context = canvasElement.getContext('2d'),
+	localP,
 	players = (function() {
 		var i = 0,
 		j = playerList.length,
 		p, list = [];
 
 		for (; i < j; ++i) { (function(p) {
-				list[p.ID] = player(context, p.ID, p.nick, p.position);
+				var newPlayer = player(context, p.ID, p.nick, p.position);
+				if (p.ID === localUserID) {
+					list[p.ID] = localPlayer(newPlayer, messages);
+				} else {
+					list[p.ID] = newPlayer;
+				}
 			} (playerList[i]));
 		}
 
 		return list;
 	} ()),
 	gameScreen = $("#game-screen"),
-	stepInterval = 10,
 	clearCanvas = function() {
 		context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 	},
@@ -46,13 +54,14 @@ var game = function(messages, playerList, localUserID) {
 			player.draw();
 		});
 
+		/*
 		if (keyHandler.isKeyPressed(KEYS.left)) {
 			messages.outgoing.sendMovedMessage(localUserID, "left");
 		}
 
 		if (keyHandler.isKeyPressed(KEYS.right)) {
 			messages.outgoing.sendMovedMessage(localUserID, "right");
-		}
+		}*/
 	},
 	images = imageManager({
 		"back": "img/game/background.png",
@@ -80,8 +89,7 @@ var game = function(messages, playerList, localUserID) {
 			var updatedPlayers = snapshot.players;
 			forEachPlayer(function(player) {
 				var updatedPlayer = updatedPlayers[player.ID];
-				player.addPosition(updatedPlayer.position);
-				//player.setPosition(updatedPlayer.position.x, updatedPlayer.position.y);
+				player.handleServerState(updatedPlayer);
 			});
 		}
 	};

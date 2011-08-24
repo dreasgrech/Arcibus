@@ -1,47 +1,64 @@
-
 var player = function(context, id, nick, initialPosition) {
-var lerp = function(x1, x2, w) {
-	return x1 + (x2 - x1) * w;
-};
+	var lerp = function(x1, x2, w) {
+		return x1 + (x2 - x1) * w;
+	};
 	var position = initialPosition,
-	image = new Image();
+	image = new Image(),
+	addPosition = function(newPosition) {
+		if ( + newPosition.x === + position.x) {
+			return;
+		}
+
+		//if (lerpValue >= 1) {
+		oldPos = position;
+		newPos = newPosition;
+		lerpValue = 0;
+		//}
+	};
+
+	position.x = +position.x;
+	position.y = +position.y;
+
 	image.onload = function() {};
 	image.src = 'img/game/player.png';
 
-	var oldPos = position, newPos = position, lerpValue = 0;
+	var oldPos = position,
+	newPos = position,
+	lerpValue = 0;
 
 	return {
 		ID: id,
 		nick: nick,
 		getPosition: function() {
-			return position;
+			return {x: position.x, y: position.y};
 		},
 		setPosition: function(x, y) {
-			position.x = x;
-			position.y = y;
+			position.x = +x;
+			position.y = +y;
 		},
 		draw: function(time) {
 			context.drawImage(image, position.x, position.y);
 		},
 		update: function(time) {
-				if (lerpValue <= 1) {
-					//console.log(position.x, newPos.x, lerpValue, lerp(position.x, newPos.x, lerpValue));
-					position.x = lerp(+oldPos.x, +newPos.x, lerpValue);
-					lerpValue += 0.2;
-				}
+				/*
+			if (lerpValue <= 1) {
+				position.x = lerp( + oldPos.x, + newPos.x, lerpValue);
+				lerpValue += 0.5;
+			}
 
-				if (lerpValue >= 1) {
-					lerpValue = 0;
-				}
+			if (lerpValue >= 1) {
+				lerpValue = 0;
+			}*/
 		},
-		addPosition: function(newPosition) {
-				     if (+newPosition.x === +position.x) {
-					     return;
-				     }
-
-				     oldPos = position;
-				     newPos = newPosition;
-				     lerpValue = 0;
+		handleServerState: function(serverPlayer) {
+//					   console.log(serverPlayer.position.x);
+			//addPosition(serverPlayer.position);
+			var diffX = +serverPlayer.position.x - +position.x;
+			if (Math.abs(diffX) < 10) {
+				position.x = +serverPlayer.position.x;
+			} else {
+			position.x += diffX * 0.1;
+			}
 		}
 	};
 };
