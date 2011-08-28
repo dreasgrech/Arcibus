@@ -15,26 +15,17 @@ class WorldSnapshotMessage extends OutgoingMessage {
 				"y"=>$player->position->y
 			));
 
-			$list[$player->ID] = JSONConstruction::constructJSONObject(array("ID" => $player->ID, "position" => $position));
+			$velocity = JSONConstruction::constructJSONObject(array(
+				"x"=>$player->velocity->x,
+				"y"=>$player->velocity->y
+			));
+
+			$list[$player->ID] = JSONConstruction::constructJSONObject(array("ID" => $player->ID, "position" => $position, "velocity" => $velocity));
 		}
 
 		unset($player);
 
 		$players = JSONConstruction::constructJSONObject($list);
-
-		/*
-		$players = JSONConstruction::constructJSONArray($this->game->players,  function ($key, $value) {
-			$position = JSONConstruction::constructJSONObject(array(
-				"x"=>$value->position->x,
-				"y"=>$value->position->y
-			));
-			return JSONConstruction::constructJSONObject(array(
-				"ID" => $value->ID,
-				"position" => $position
-			));
-		});
-
-		 */
 
 		return $this->manuallyConstructMessage(array(
 			"players" => $players

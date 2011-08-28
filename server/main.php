@@ -7,7 +7,7 @@ include 'StringUtils.php';
 include 'logger.php';
 include 'player.php';
 include 'outgoingmessages/OutgoingMessage.php';
-include 'outgoingmessages/WelcomePlayerMessage.php';
+include 'outgoingmessages/WelcomeUserMessage.php';
 include 'outgoingmessages/ChatMessage.php';
 include 'outgoingmessages/UserListMessage.php';
 include 'outgoingmessages/StartGameMessage.php';
@@ -20,7 +20,7 @@ include 'UserList.php';
 
 class Timer {
 
-	public function hasSecondsPassedSince($secondsPassed, $since) {
+	public function hasMillisecondsPassedSince($secondsPassed, $since) {
 		$now = $this->nowInMilliseconds();
 		//echo $now - $since . PHP_EOL;
 		//echo "$now $since $secondsPassed" . PHP_EOL;
@@ -76,11 +76,12 @@ $hooks = array(
 			}, 'onMessage' => function ($s, $message, $socket) use (&$messageHandler, $logger) {
 				$data = json_decode($message);
 				$ip = $s->getIPAddress($socket);
-				$logger->logMessageRecieved($ip, $message);
+				//$logger->logMessageRecieved($ip, $message);
+				echo $message . PHP_EOL;
 				$messageHandler->handleMessage($socket, $data);
 			},
 				'onIteration' => function ($s) use (&$game, &$users, $logger, $timer, &$lastSnapshot) {
-					$available = $users->getReadyUsers(2);
+					$available = $users->getReadyUsers(4);
 					if (!$game->isInProgress && count($available) > 0) { // Ready to start the game because a game is not in progress and there are enough players to start a game
 						$logger->logServerAction("Starting the game");
 
@@ -97,7 +98,7 @@ $hooks = array(
 */
 
 					if ($game->isInProgress) {
-						if ($timer->hasSecondsPassedSince(50, $lastSnapshot)) {
+						if ($timer->hasMillisecondsPassedSince(500, $lastSnapshot)) {
 							//$logger->logServerAction("SNAPSHOT");
 							$lastSnapshot = $timer->nowInMilliseconds();
 							$snapshot = $game->createSnapshot();

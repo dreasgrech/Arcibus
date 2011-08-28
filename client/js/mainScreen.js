@@ -6,6 +6,7 @@ var mainScreen = function(messages) {
 	listPlaceholder = $('#availableUsers'),
 	userNameInput = $('#userNameInput'),
 	connectButton = $('#connectButton'),
+	local,
 	addToUserList = function(user) {
 		var userRow = $('<div/>'),
 		color = "white";
@@ -27,19 +28,18 @@ var mainScreen = function(messages) {
 		return name.length && name.length <= 15;
 	},
 	chats = chatHandler(chatLogs, chatInput, function(keyCode) {
+		var chatText;
 		if (keyCode === 13) { // Enter key
-			messages.outgoing.sendChat(local.ID, chatInput.val());
+			chatText = chatInput.val();
+			if (!chatText.length) { // chat box is empty
+				return;
+			}
+
+			messages.outgoing.sendChat(chatText);
 			chats.clearChatInput();
 		}
 	}),
-	local;
-
-	readyButton.click(function() {
-		messages.outgoing.sendReadySignal(local.ID);
-		readyButton.attr("disabled", true); // Disable the ready button
-	});
-
-	connectButton.click(function() {
+	connect = function() {
 		var userName = userNameInput.val();
 		if (!validateUserNick(userName)) {
 			alert("That name is not available");
@@ -49,7 +49,23 @@ var mainScreen = function(messages) {
 		connectButton.attr("disabled", true); // Disable the Connect button
 		userNameInput.attr("disabled", true); // Disable the name input box
 		messages.outgoing.sendIntroduction(userName);
+
+	},
+	ready = function() {
+		messages.outgoing.sendReadySignal();
+		readyButton.attr("disabled", true); // Disable the ready button
+	};
+
+	readyButton.click(ready);
+	connectButton.click(connect);
+
+	userNameInput.keypress(function(ev) { //Once the client presses ENTER in the name-input box, connect
+		if (ev.which === 13) {
+			connect();
+		}
 	});
+
+	userNameInput.focus();
 
 	return {
 		initiateLocalUser: function(id, nick) {
@@ -69,7 +85,8 @@ var mainScreen = function(messages) {
 			for (; i < j; ++i) {
 				addToUserList(users[i]);
 			}
-		}, hide: function () {
+		},
+		hide: function() {
 			screen.hide();
 		}
 	};

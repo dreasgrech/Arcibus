@@ -23,7 +23,11 @@
 		});
 
 		messages.incoming.registerMessageAction("startgame", function(data) {
-				currentGame = game(messages, data["players"], localUserID);
+				var playerTurningPoint = data["playerTurningPoint"];
+				playerTurningPoint.x = +playerTurningPoint.x;
+				playerTurningPoint.y = +playerTurningPoint.y;
+
+				currentGame = game(messages, data["players"], localUserID, +data["playerNumber"], playerTurningPoint);
 				main.hide();
 		});
 

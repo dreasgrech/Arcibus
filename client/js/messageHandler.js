@@ -6,11 +6,8 @@ var messageHandler = function(client) {
 		playerMove: "playerMove",
 		playerlist: "playerlist"
 	},
-	sendMessage = function(id, action, data) {
+	sendMessage = function(action, data) {
 		data = data || {};
-		if (id) {
-			data.ID = id;
-		}
 		data.action = action;
 		client.send(JSON.stringify(data));
 	};
@@ -42,26 +39,24 @@ var messageHandler = function(client) {
 			}*/
 		},
 		outgoing: {
-			sendMovedMessage: function(id, direction) {
-				sendMessage(id, "moved", {
+			sendMovedMessage: function(direction) {
+				sendMessage("moved", {
 					direction: direction
 				});
 			},
-			sendStateMessage: function(id, position) {
-				sendMessage(id, "playerstate", {
-					position: position
-				});
+			sendUserCMD: function(pressedKeys) {
+				sendMessage("usercmd", {keys: pressedKeys});
 			},
-			sendReadySignal: function(id) {
-				sendMessage(id, "ready");
+			sendReadySignal: function() {
+				sendMessage("ready");
 			},
 			sendIntroduction: function(nick) {
-				sendMessage(0, "introduction", {
+				sendMessage("introduction", {
 					nick: nick
 				});
 			},
-			sendChat: function(id, message) {
-				sendMessage(id, "chat", {
+			sendChat: function(message) {
+				sendMessage("chat", {
 					chat: message
 				});
 

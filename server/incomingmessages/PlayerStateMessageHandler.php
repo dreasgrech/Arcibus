@@ -3,8 +3,10 @@ class PlayerStateMessageHandler extends IncomingMessageHandler implements iIncom
 
 	public function handle($socket, $message) {
 		$player = $this->game->getPlayerFromSocket($socket);
-		$player->position = $message->position;
-		var_dump($message->position);
+		$this->game->handleUserCMD($player, $message);
+
+		//$player->position = $message->position;
+		//$player->velocity = $message->velocity;
 	}
 }
 ?>

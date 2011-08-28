@@ -2,36 +2,155 @@ var lerp = function(x1, x2, w) {
 	return x1 + (x2 - x1) * w;
 };
 
-var localPlayer = function(playerObj, messages) {
-	var modifiedPlayer = playerObj, parentUpdate = playerObj.update, parentHandleServerState = playerObj.handleServerState;
+var localPlayer = function(playerObj, playerNumber, localPlayerTurningPoint, messages) {
+	var modifiedPlayer = playerObj,
+	parentUpdate = playerObj.update,
+	parentHandleServerState = playerObj.handleServerState,
+	angle = 0,
+	isMoving = false,
+	speed = 200,
+	userKeys = {
+		left: 1,
+		right: 2
+	},
+	pressedKeys = 0,
+	getPressedKeys = function() {
+		var keys = 0;
+		if (keyHandler.isKeyPressed(KEYS.left)) {
+			keys |= userKeys.left;
+		}
+
+		if (keyHandler.isKeyPressed(KEYS.right)) {
+			keys |= userKeys.right;
+		}
+		return keys;
+	},
+	getVelocity = function() {
+		angle = Math.round(angle);
+		return {
+			y: Math.cos(angle) * speed,
+			x: Math.sin(angle) * speed
+		};
+	},
+	userCMDs = [],
+	generateUserCMD = function(keysPressed) {
+		return {
+			keys: keysPressed
+		};
+	},
+	userCMDHandler = (function() {
+		// TODO: shift sent messages out of the buffer
+		var next = 0,
+		buffer = [];
+
+		return {
+			addUserCMD: function(userCMD) {
+				buffer.push(userCMD);
+			},
+			sendUserCMD: function() {
+				if (buffer[next]) {
+					messages.outgoing.sendUserCMD(buffer[next++].keys);
+				}
+			}
+		};
+	} ());
 
 	modifiedPlayer.handleServerState = function(serverPlayer) {
 		//console.log('Recieved my own state');
 	};
 
+	setInterval(userCMDHandler.sendUserCMD, 10);
+
+	var orientation = 'horizontal';
+
+	var orientHorizontal = function () {
+		orientation = 'horizontal';
+		modifiedPlayer.setAngle(0);
+	}, orientVertical = function () {
+		orientation = 'vertical';
+		modifiedPlayer.setAngle(Math.PI / 2);
+	}
+
 	modifiedPlayer.update = function(time) {
+		pressedKeys = getPressedKeys();
+		var isLeftPressed = (pressedKeys & userKeys.left),
+		isRightPressed = (pressedKeys & userKeys.right);
 
-		var speed = 250;
-		if (keyHandler.isKeyPressed(KEYS.left)) {
-			var currPos = modifiedPlayer.getPosition();
-			currPos.x -= speed * time;
-			//parentHandleServerState({position: currPos});
-			playerObj.setPosition(currPos.x, currPos.y);
+		// If the user is holding both left and right, then ignore the input completely.
+		if (pressedKeys === (userKeys.left | userKeys.right)) {
+			return;
 		}
 
-		if (keyHandler.isKeyPressed(KEYS.right)) {
-			var currPos = modifiedPlayer.getPosition();
-			currPos.x += speed * time;
-			//parentHandleServerState({position: currPos});
-			playerObj.setPosition(currPos.x, currPos.y);
-		}
+		if (isLeftPressed || isRightPressed) {
+			var curr = modifiedPlayer.getPosition();
 
-		if (keyHandler.isKeyPressed(KEYS.left) || keyHandler.isKeyPressed(KEYS.right)) {
-			messages.outgoing.sendStateMessage(modifiedPlayer.ID, modifiedPlayer.getPosition());
+			if (isLeftPressed) {
+				if (orientation === 'horizontal') {
+					curr.x -= speed * time;
+				} else { // orientation is vertical
+					if (playerNumber === 1 || playerNumber === 4) { // top left, bottom right
+						curr.y += speed * time;
+					} else {
+						curr.y -= speed * time;
+					}
+				}
+
+			} else { // RIGHT is pressed
+				if (orientation === 'horizontal') {
+					curr.x += speed * time;
+				} else { // orientation is vertical
+					if (playerNumber === 1 || playerNumber === 4) { // top left, bottom right
+						curr.y -= speed * time;
+					} else {
+						curr.y += speed * time;
+					}
+				}
+			}
+
+			if (playerNumber % 2) { // 1 and 3
+				if (curr.x >= localPlayerTurningPoint.x && orientation == 'horizontal') {
+					curr.x = localPlayerTurningPoint.x - 1;
+					orientVertical();
+				}
+
+				if (orientation === 'vertical') {
+					if (playerNumber === 1 && curr.y >= localPlayerTurningPoint.y) {
+						curr.y = localPlayerTurningPoint.y - 1;
+						orientHorizontal();
+					} 
+
+					if (playerNumber === 3 && curr.y <= localPlayerTurningPoint.y) { // player 3
+						curr.y = localPlayerTurningPoint.y + 1;
+						orientHorizontal();
+					}
+				}
+			} else { // 2 and 4
+				if (curr.x <= localPlayerTurningPoint.x && orientation == 'horizontal') {
+					curr.x = localPlayerTurningPoint.x + 1;
+					orientVertical();
+				}
+
+				if (orientation === 'vertical') {
+					if (playerNumber === 2 && curr.y >= localPlayerTurningPoint.y) {
+						curr.y = localPlayerTurningPoint.y - 1;
+						orientHorizontal();
+					} 
+
+					if (playerNumber === 4 && curr.y <= localPlayerTurningPoint.y) { // player 3
+						curr.y = localPlayerTurningPoint.y + 1;
+						orientHorizontal();
+					}
+
+				}
+			}
+
+			//curr.x += getVelocity().x * time;
+			playerObj.setPosition(curr.x, curr.y);
+
+			userCMDHandler.addUserCMD(generateUserCMD(pressedKeys));
 		}
 
 		//parentUpdate(time);
-
 	};
 
 	return modifiedPlayer;
@@ -48,7 +167,7 @@ var localPlayer = function(playerObj, messages) {
 			};
 		},
 		sendMovedMessage = function() {
-			messageHandler.outgoing.sendMovedMessage(id, playerObj.position);
+			messageHandler.outgoing.sendMovedMessage(playerObj.position);
 		};
 
 		playerObj.moveLeft = function(time) {

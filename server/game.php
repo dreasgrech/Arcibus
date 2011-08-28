@@ -1,24 +1,39 @@
 <?php
+class PlayerStartData {
+	public $position;
+	public $turningPoint;
+	public function __construct($position, $turningPoint) {
+		$this->position = $position;
+		$this->turningPoint = $turningPoint;
+	}
+
+}
+
 class Game {
 	public $players = array();
 	public $ingamePlayers = array();
 	public $isInProgress;
+	private $startingPositions = array();
 
 	public function __construct() {
 		$this->isInProgress = false;
+		$this->startingPositions[] = new PlayerStartData(new Vector2(320, 270), new Vector2(360, 270)); // Player 1
+		$this->startingPositions[] = new PlayerStartData(new Vector2(481, 270), new Vector2(441, 270)); // Player 2
+		$this->startingPositions[] = new PlayerStartData(new Vector2(320, 335), new Vector2(360, 335)); // Player 3
+		$this->startingPositions[] = new PlayerStartData(new Vector2(481, 335), new Vector2(441, 335)); // Player 4
 	}
 
 	public function start($users) {
-		foreach($users as $user) {
-			$position = new Vector2(rand(10,400), rand(10,400));
-			$newPlayer = new Player($user, $position);
+		for ($i = 0; $i < count($users); ++$i) {
+			$user = $users[$i];
+			$newPlayer = new Player($user, $i + 1, $this->startingPositions[$i]->position, $this->startingPositions[$i]->turningPoint);
 			$this->addPlayer($newPlayer);
 			$user->inGame = true;
 		}
-		unset($user);
 
-		$startMessage = new StartGameMessage($this);
-		$this->iteratePlayers(function ($player) use($startMessage) {
+		$that = $this;
+		$this->iteratePlayers(function ($player) use($that) {
+			$startMessage = new StartGameMessage($that, $player->number, $player->turningPoint);
 			$player->sendMessage($startMessage);
 		});
 
@@ -61,6 +76,10 @@ class Game {
 			}
 		}
 		unset($player);
+	}
+
+	public function handleUserCMD($player, $data) {
+		$player->handleUserKeys($data->keys);
 	}
 
 	// Sends a message to every player

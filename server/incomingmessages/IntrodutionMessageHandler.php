@@ -12,7 +12,7 @@ class IntrodutionMessageHandler extends IncomingMessageHandler implements iIncom
 		$sanitizedNick = $this->sanitize($message->nick);
 		$newUser = $this->userList->addUser($socket, User::generateUserID(), $sanitizedNick);
 
-		$welcomeMessage = new WelcomePlayerMessage($newUser);
+		$welcomeMessage = new WelcomeUserMessage($newUser);
 		$socket->send($welcomeMessage);
 
 		$userListMessage = new UserListMessage($this->userList->users);

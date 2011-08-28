@@ -1,5 +1,5 @@
 <?php
-class WelcomePlayerMessage extends OutgoingMessage {
+class WelcomeUserMessage extends OutgoingMessage {
 	public $user;
 
 	public function __construct($user) {
@@ -8,7 +8,10 @@ class WelcomePlayerMessage extends OutgoingMessage {
 	}
 
 	public function __toString() {
-		return $this->manuallyConstructMessage(array("ID"=>$this->user->ID, "nick"=>$this->user->nick));
+		return $this->manuallyConstructMessage(array(
+			"ID"=>$this->user->ID,
+			"nick"=>$this->user->nick
+		));
 	}
 }
 ?>

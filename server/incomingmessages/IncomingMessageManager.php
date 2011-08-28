@@ -28,7 +28,7 @@ class IncomingMessageManager {
 		$this->handlers["chat"] = new ChatMessageHandler($server, $this->game, $this->userList);
 		$this->handlers["ready"] = new ReadySignalHandler($server, $this->game, $this->userList);
 		$this->handlers["moved"] = new PlayerMovedMessageHandler($server, $this->game, $this->userList);
-		$this->handlers["playerstate"] = new PlayerStateMessageHandler($server, $this->game, $this->userList);
+		$this->handlers["usercmd"] = new PlayerStateMessageHandler($server, $this->game, $this->userList);
 
 	}
 

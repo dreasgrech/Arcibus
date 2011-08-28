@@ -1,4 +1,5 @@
-var game = function(messages, playerList, localUserID) {
+var game = function(messages, playerList, localUserID, localPlayerNumber, localPlayerTurningPoint) {
+	console.log(localPlayerNumber);
 	var canvasElement = $('#mainCanvas')[0];
 
 	if (!canvasElement.getContext) {
@@ -9,10 +10,9 @@ var game = function(messages, playerList, localUserID) {
 	canvasElement.height = 600;
 
 
-	var FRAME_RATE=100,  stepInterval=1000/FRAME_RATE;
+	var FRAME_RATE=150,  stepInterval=1000/FRAME_RATE;
 
 	var context = canvasElement.getContext('2d'),
-	localP,
 	players = (function() {
 		var i = 0,
 		j = playerList.length,
@@ -21,7 +21,7 @@ var game = function(messages, playerList, localUserID) {
 		for (; i < j; ++i) { (function(p) {
 				var newPlayer = player(context, p.ID, p.nick, p.position);
 				if (p.ID === localUserID) {
-					list[p.ID] = localPlayer(newPlayer, messages);
+					list[p.ID] = localPlayer(newPlayer, localPlayerNumber, localPlayerTurningPoint, messages);
 				} else {
 					list[p.ID] = newPlayer;
 				}
@@ -56,11 +56,11 @@ var game = function(messages, playerList, localUserID) {
 
 		/*
 		if (keyHandler.isKeyPressed(KEYS.left)) {
-			messages.outgoing.sendMovedMessage(localUserID, "left");
+			messages.outgoing.sendMovedMessage("left");
 		}
 
 		if (keyHandler.isKeyPressed(KEYS.right)) {
-			messages.outgoing.sendMovedMessage(localUserID, "right");
+			messages.outgoing.sendMovedMessage("right");
 		}*/
 	},
 	images = imageManager({
