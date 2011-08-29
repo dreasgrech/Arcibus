@@ -74,7 +74,9 @@ var localPlayer = function(playerObj, playerNumber, localPlayerTurningPoint, mes
 	modifiedPlayer.update = function(time) {
 		pressedKeys = getPressedKeys();
 		var isLeftPressed = (pressedKeys & userKeys.left),
-		isRightPressed = (pressedKeys & userKeys.right);
+		isRightPressed = (pressedKeys & userKeys.right),
+		curr = modifiedPlayer.getPosition(),
+		positionBeforeUpdate = {x: curr.x, y: curr.y};
 
 		// If the user is holding both left and right, then ignore the input completely.
 		if (pressedKeys === (userKeys.left | userKeys.right)) {
@@ -82,7 +84,6 @@ var localPlayer = function(playerObj, playerNumber, localPlayerTurningPoint, mes
 		}
 
 		if (isLeftPressed || isRightPressed) {
-			var curr = modifiedPlayer.getPosition();
 
 			if (isLeftPressed) {
 				if (orientation === 'horizontal') {
@@ -114,7 +115,7 @@ var localPlayer = function(playerObj, playerNumber, localPlayerTurningPoint, mes
 				}
 
 				if (orientation === 'vertical') {
-					if (playerNumber === 1 && curr.y >= localPlayerTurningPoint.y) {
+					if (playerNumber === 1 && curr.y >= localPlayerTurningPoint.y) { // player 1
 						curr.y = localPlayerTurningPoint.y - 1;
 						orientHorizontal();
 					} 
@@ -131,23 +132,36 @@ var localPlayer = function(playerObj, playerNumber, localPlayerTurningPoint, mes
 				}
 
 				if (orientation === 'vertical') {
-					if (playerNumber === 2 && curr.y >= localPlayerTurningPoint.y) {
+					if (playerNumber === 2 && curr.y >= localPlayerTurningPoint.y) { // player 2
 						curr.y = localPlayerTurningPoint.y - 1;
 						orientHorizontal();
 					} 
 
-					if (playerNumber === 4 && curr.y <= localPlayerTurningPoint.y) { // player 3
+					if (playerNumber === 4 && curr.y <= localPlayerTurningPoint.y) { // player 4
 						curr.y = localPlayerTurningPoint.y + 1;
 						orientHorizontal();
 					}
-
 				}
 			}
 
-			//curr.x += getVelocity().x * time;
-			playerObj.setPosition(curr.x, curr.y);
+			console.log(curr.y);
+			if ((curr.x - (playerObj.getWidth() / 2)) <= 0) { // LEFT edge
+				curr.x = (playerObj.getWidth() / 2) + 1;
+			} else if (curr.x + (playerObj.getWidth() / 2) >= playerObj.context.canvas.width) { // RIGHT edge
+				curr.x = (playerObj.context.canvas.width - 1) - (playerObj.getWidth()/2);
+			} else if ((curr.y - (playerObj.getWidth() / 2)) <= 0) { // TOP edge
+				curr.y = (playerObj.getWidth() / 2) + 1;
+			} else if (curr.y + (playerObj.getWidth() / 2) >= playerObj.context.canvas.height) { // BOTTOM edge
+				curr.y = (playerObj.context.canvas.height - 1) - (playerObj.getWidth()/2);
+			}
 
-			userCMDHandler.addUserCMD(generateUserCMD(pressedKeys));
+			//curr.x += getVelocity().x * time;
+			
+			if (!(positionBeforeUpdate.x === curr.x && positionBeforeUpdate.y === curr.y)) { // Only update the position if there was a change from the previous postion.
+				playerObj.setPosition(curr.x, curr.y);
+				userCMDHandler.addUserCMD(generateUserCMD(pressedKeys));
+			}
+
 		}
 
 		//parentUpdate(time);

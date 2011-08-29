@@ -49,6 +49,13 @@ var player = function(context, id, nick, initialPosition) {
 	return {
 		ID: id,
 		nick: nick,
+		context:context,
+		getWidth: function () {
+			return image.width;
+		},
+		getHeight: function () {
+			return image.height;
+		},
 		getPosition: function() {
 			return {
 				x: +position.x,
